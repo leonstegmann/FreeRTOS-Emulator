@@ -8,8 +8,6 @@
 #include "TUM_Event.h"
 #include "TUM_Font.h"
 
-#include"buttons.h"
-
 void vDraw(void *pvParameters)
 {
 
@@ -26,6 +24,15 @@ void vDraw(void *pvParameters)
     signed short y_s = (SCREEN_HEIGHT / 2) - w / 2;
 	unsigned int colour_s = Red;
 
+    //create local variables for Drawing Triangle
+    coord_t coords[3] = {{-25,-23},{0,23},{25,-23}};
+    coord_t coordsCentered[3];    
+    for (int i=0; i<3; i++){
+        coordsCentered[i].x = coords[i].x + SCREEN_WIDTH / 3  ;
+        coordsCentered[i].y = coords[i].y + SCREEN_HEIGHT/2 ;
+    }
+	unsigned int colour_t = Orange;
+        
     //Transfers the drawing ability to the calling thread/taskd
     tumDrawBindThread();
     
@@ -40,6 +47,8 @@ void vDraw(void *pvParameters)
         if(!tumDrawFilledBox( x_s, y_s, w, h, colour_s))
             tumDrawFilledBox( x_s, y_s, w, h, colour_s);
         
+        if(!tumDrawTriangle( coordsCentered, colour_t))
+            tumDrawTriangle( coordsCentered, colour_t);
         
         tumDrawUpdateScreen();
         vTaskDelay((TickType_t) 1000);
