@@ -2,12 +2,11 @@ include(ExternalProject)
 find_package(Git REQUIRED)
 
 SET(CHECK_FILES
-    #${PROJECT_SOURCE_DIR}/lib/FreeRTOS_Kernel/include/*.h
-    #${PROJECT_SOURCE_DIR}/lib/FreeRTOS_Kernel/portable/GCC/Posix/*.h
     ${PROJECT_SOURCE_DIR}/include/*.h
     ${PROJECT_SOURCE_DIR}/lib/Gfx/include/*.h
+    ${PROJECT_SOURCE_DIR}/lib/Gfx/*.c
     ${PROJECT_SOURCE_DIR}/lib/AsyncIO/include/*.h
-    #${PROJECT_SOURCE_DIR}/lib/tracer/include/*.h
+    ${PROJECT_SOURCE_DIR}/lib/AsyncIO/*.c
     ${PROJECT_SOURCE_DIR}/src/*.c)
 
 SET(TIDY_SOURCES
@@ -64,6 +63,7 @@ if(ENABLE_ASTYLE)
         DOWNLOAD_DIR        ${CMAKE_BINARY_DIR}/external/astyle/download
         SOURCE_DIR          ${CMAKE_BINARY_DIR}/external/astyle/src
         BINARY_DIR          ${CMAKE_BINARY_DIR}/external/astyle/build
+        UPDATE_COMMAND      "" # this keeps cmake from rebuilding astyle every time you run "make"
     )
 
     list(APPEND ASTYLE_ARGS
@@ -112,8 +112,8 @@ endif()
 
 if(ENABLE_CLANG_TIDY)
 
-    find_program(CLANG_TIDY_BIN clang-tidy-4.0)
-    find_program(RUN_CLANG_TIDY_BIN run-clang-tidy-4.0.py
+    find_program(CLANG_TIDY_BIN clang-tidy)
+    find_program(RUN_CLANG_TIDY_BIN run-clang-tidy.py
         PATHS /usr/share/clang
     )
 
@@ -172,7 +172,8 @@ if(ENABLE_CPPCHECK)
     )
 
     list(APPEND CPPCHECK_ARGS
-        --enable=warning,style,performance,portability,unusedFunction
+        --enable=warning,style,performance,portability
+        --suppress=arithOperationsOnVoidPointer
         --std=c99
         --verbose
         --error-exitcode=1

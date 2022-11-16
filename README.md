@@ -7,13 +7,6 @@
   <a href="https://github.com/alxhoff/FreeRTOS-Emulator/blob/master/LICENSE">
     <img src="https://img.shields.io/badge/license-GPLv3-blue.svg" />
   </a>
-  <a href="https://scan.coverity.com/projects/alxhoff-freertos-emulator">
-  <img alt="Coverity Scan Build Status"
-       src="https://scan.coverity.com/projects/20757/badge.svg"/>
-  </a>
-  <a href="https://codecov.io/gh/alxhoff/FreeRTOS-Emulator">
-  <img src="https://codecov.io/gh/alxhoff/FreeRTOS-Emulator/branch/master/graph/badge.svg" />
-</a>
 </p>
 
 An implementation of POSIX based FreeRTOS with the combination of SDL2 graphics. Aimed at providing an x86 emulation solution for teaching FreeRTOS to students without the need of embedded hardware. Used at the Technical University of Munich in the teaching of the "Embedded Systems Programming Lab". Please excuse any references to "students" or "course" if you're not one of my students.
@@ -59,7 +52,7 @@ sudo pacman -S clang
 
 ....install linux?
 
-(Have a look at the [Remote Toolchain](../../wiki/Remote-Toolchain) wiki section)
+(See [Wiki](../../wiki/Home))
 
 ## Building
 
@@ -74,6 +67,14 @@ For those requiring an IDE run
 cmake -G "Eclipse CDT4 - Unix Makefiles" ./
 ```
 to generate the appropriate project files to allow for the emulator to be imported into Eclipse.
+
+We also includes templates for Configuring VSCode automatically. Run the following in the `build` directory to install them:
+
+```bash
+cmake -DUSE_IDE=vscode ..
+```
+
+Further Information: [Development-Environment](../../wiki/Development-Environment)
 
 ### Additional targets
 
