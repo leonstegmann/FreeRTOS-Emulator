@@ -44,7 +44,7 @@ square_t *createSquare(coord_t initial_location,  unsigned short initial_width,
     return ret;
 }
 
-triangle_t *createTriangle(coord_t initial_location, coord_t *initial_corners[0],
+triangle_t *createTriangle(coord_t initial_location, coord_t* initial_corners,
                    unsigned int colour)
 {
     triangle_t *ret = calloc(1, sizeof(triangle_t));
@@ -55,9 +55,9 @@ triangle_t *createTriangle(coord_t initial_location, coord_t *initial_corners[0]
     }
 
     ret->location = initial_location;
-    ret->corners[0] = *initial_corners[0];
-    ret->corners[1] = *initial_corners[1];
-    ret->corners[2] = *initial_corners[2];
+    ret->corners[0] = *initial_corners;
+    ret->corners[1] = *(initial_corners+1);
+    ret->corners[2] = *(initial_corners+2);
     ret->colour = colour;
     ret->dx = 0;
     ret->dy = 0;    
