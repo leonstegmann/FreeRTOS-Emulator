@@ -44,6 +44,27 @@ void xGetButtonInput(void)
 
 #define KEYCODE(CHAR) SDL_SCANCODE_##CHAR
 
+//Swap Buffers 
+static TaskHandle_t StateMachine = NULL;
+static TaskHandle_t BufferSwap = NULL;
+
+SemaphoreHandle_t DrawSignal = NULL;
+
+void vSwapBuffers(void *pvParameters)
+{
+    TickType_t xLastWakeTime;
+    xLastWakeTime = xTaskGetTickCount();
+    const TickType_t frameratePeriod = 20;
+
+    while (1) {
+        tumDrawUpdateScreen();
+        tumEventFetchEvents(FETCH_EVENT_BLOCK);
+        xSemaphoreGive(DrawSignal);
+        vTaskDelayUntil(&xLastWakeTime,
+                        pdMS_TO_TICKS(frameratePeriod));
+    }
+}
+
 int main(int argc, char *argv[])
 {
 	char *bin_folder_path = tumUtilGetBinFolderPath(argv[0]);
@@ -76,12 +97,21 @@ int main(int argc, char *argv[])
 		goto err_demotask;
 	}
 
+    if (xTaskCreate(vSwapBuffers, "BufferSwapTask",
+                    mainGENERIC_STACK_SIZE * 2, NULL, configMAX_PRIORITIES,
+                    &BufferSwap) != pdPASS) {
+        PRINT_TASK_ERROR("BufferSwapTask");
+        goto err_bufferswap;
+    }
+
 	vTaskStartScheduler();
 
 	return EXIT_SUCCESS;
 
 err_demotask:
 	vSemaphoreDelete(buttons.lock);
+err_bufferswap:
+    vTaskDelete(StateMachine);
 err_buttons_lock:
 	tumSoundExit();
 err_init_audio:
