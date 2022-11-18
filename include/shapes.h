@@ -5,11 +5,11 @@
 #include"TUM_Draw.h"
 
 typedef struct shape {
-
-    coord_t location; /**< Absolute location of circle */
+    coord_t pixelLocation;  /**< Pixel coord on screen */
+    coord_t location; /**< Absolute location */
     float dx; /**< X axis speed in pixels/second */
     float dy; /**< Y axis speed in pixels/second */
-    unsigned int colour; /**< Hex RGB colour of the ball */
+    unsigned int colour; /**< Hex RGB colour */
 
 } shape_t;
 
@@ -17,7 +17,7 @@ typedef struct shape {
 typedef struct circle {
 
     shape_t shape; /**< Inheriting properties from struct shape*/
-    unsigned short radius; /**< Radius of the ball in pixels */
+    unsigned short radius; /**< Radius in pixels */
  
 } circle_t;
 

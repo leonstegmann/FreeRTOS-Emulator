@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include"stdlib.h"
+#include"math.h"
 
 #include"TUM_Draw.h"
 
@@ -16,9 +17,10 @@ circle_t *createCircle(coord_t initial_location, unsigned short radius,
     }
 
     ret->shape.location = initial_location;
+    ret->shape.pixelLocation = initial_location;
     ret->shape.colour = colour;
     ret->shape.dx = 0;
-    ret->shape.dy = 0;    
+    ret->shape.dy = 5;    
     ret->radius = radius;
 
     return ret;
@@ -35,6 +37,7 @@ square_t *createSquare(coord_t initial_location,  unsigned short initial_width,
     }
 
     ret->shape.location = initial_location;
+    ret->shape.pixelLocation = initial_location;
     ret->shape.colour = colour;
     ret->shape.dx = 0;
     ret->shape.dy = 0;    
@@ -55,6 +58,7 @@ triangle_t *createTriangle(coord_t initial_location, coord_t* initial_corners,
     }
 
     ret->shape.location = initial_location;
+    ret->shape.pixelLocation = initial_location;
     ret->shape.colour = colour;
     ret->shape.dx = 0;
     ret->shape.dy = 0;    
@@ -88,4 +92,10 @@ int drawTriangle(triangle_t *triangle){
     return 0;
 }
 
-//void rotateShape
+void moveShape(shape_t* shape, unsigned int milli_seconds){
+    float update_interval = milli_seconds / 1000.0;
+    shape->location.x += shape->dx * update_interval;
+    shape->location.y += shape->dy * update_interval;
+    shape->pixelLocation.x = round(shape->location.x);
+    shape->pixelLocation.y = round(shape->location.y);
+ }
