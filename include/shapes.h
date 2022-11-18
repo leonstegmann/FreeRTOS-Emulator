@@ -1,47 +1,41 @@
 #ifndef __SHAPES_H__  
 #define __SHAPES_H__
 
+#include"stdio.h"
 #include"TUM_Draw.h"
+
+typedef struct shape {
+
+    coord_t location; /**< Absolute location of circle */
+    float dx; /**< X axis speed in pixels/second */
+    float dy; /**< Y axis speed in pixels/second */
+    unsigned int colour; /**< Hex RGB colour of the ball */
+
+} shape_t;
+
 
 typedef struct circle {
 
+    shape_t shape; /**< Inheriting properties from struct shape*/
     unsigned short radius; /**< Radius of the ball in pixels */
-
-    coord_t location; /**< Absolute location of circle */
-
-    float dx; /**< X axis speed in pixels/second */
-    float dy; /**< Y axis speed in pixels/second */
-
-    unsigned int colour; /**< Hex RGB colour of the ball */
-
+ 
 } circle_t;
+
 
 typedef struct triangle {
 
+    shape_t shape; /**< Inheriting properties from struct shape*/
     coord_t corners[3];
-
-    coord_t location; /**< Absolute location of circle */
-
-
-    float dx; /**< X axis speed in pixels/second */
-    float dy; /**< Y axis speed in pixels/second */
-
-    unsigned int colour; /**< Hex RGB colour of the ball */
 
 } triangle_t;
 
+
 typedef struct square {
 
+    shape_t shape; /**< Inheriting properties from struct shape*/
     unsigned short width; /**< Width of square */
     unsigned short height; /**< Height of square */
     
-    coord_t location; /**< Absolute location of circle */
-
-    float dx; /**< X axis speed in pixels/second */
-    float dy; /**< Y axis speed in pixels/second */
-
-    unsigned int colour; /**< Hex RGB colour of the ball */
-
 } square_t;
 
 circle_t* createCircle(coord_t , unsigned short ,unsigned int );
