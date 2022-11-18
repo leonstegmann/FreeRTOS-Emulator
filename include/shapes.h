@@ -44,6 +44,12 @@ typedef struct square {
 
 } square_t;
 
+circle_t *createCircle(coord_t , unsigned short ,unsigned int );
+
+square_t *createSquare(coord_t ,  unsigned short , unsigned short , unsigned int );
+
+triangle_t *createTriangle(coord_t , coord_t* , unsigned int );
+
 int drawCircle(circle_t* );
 
 int drawSquare(square_t* );
