@@ -61,33 +61,3 @@ void vDraw(void *pvParameters)
     }
 
 }
-
-int drawCircle(circle_t *circle){
-    tumDrawCircle( circle->location.y,circle->location.y, circle->radius, circle->colour);
-    return 0;
-}
-
-int drawSquare(square_t *square){
-    tumDrawFilledBox( square->location.x - square->width/2 ,square->location.y + square->height/2, square->width, square->height, square->colour);
-    return 0;
-}
-
-int drawTriangle(triangle_t *triangle){
-    coord_t coordsCentered[3];
-    for (int i=0; i<3; i++){
-        coordsCentered[i].x = triangle->corners[i].x + SCREEN_WIDTH / 2  ;
-        coordsCentered[i].y = triangle->corners[i].y + SCREEN_HEIGHT/2 ;
-    }
-    tumDrawTriangle(coordsCentered, triangle->colour);
-    return 0;
-}
-
-// void rotateShape(shape_t *ball, unsigned int milli_seconds)
-// {
-//     float update_interval = milli_seconds / 1000.0;
-//     ball->f_x += ball->dx * update_interval;
-//     ball->f_y += ball->dy * update_interval;
-//     ball->x = round(ball->f_x);
-//     ball->y = round(ball->f_y);
-// }
-
