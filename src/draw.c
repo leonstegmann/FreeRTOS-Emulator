@@ -15,14 +15,14 @@
 void vDraw(void *pvParameters)
 {
     //define Circle Object pramteters
-    coord_t startingPoint_circle = {SCREEN_WIDTH / 3, SCREEN_HEIGHT / 2 };
+    coord_t startingPoint_circle = {SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2 };
     unsigned short radius = 30;
 
     //CREATE OBJECT
     circle_t *red_circle = createCircle(startingPoint_circle, radius, Red);
 
     //define Square Object pramteters
-    coord_t startingPoint_square = {2 * SCREEN_WIDTH / 3, SCREEN_HEIGHT / 2 };
+    coord_t startingPoint_square = {3 * SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2 };
     signed short square_width = 60;
     signed short square_height = 60;
 
