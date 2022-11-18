@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
 
 	if (xTaskCreate(vDraw, "Draw_exercise_2", mainGENERIC_STACK_SIZE * 2, NULL,
                     mainGENERIC_PRIORITY, &Draw) != pdPASS) {
-		goto err_demotask;
+		goto err_drawing;
 	}
 
     if (xTaskCreate(vSwapBuffers, "BufferSwapTask",
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
 
 	return EXIT_SUCCESS;
 
-err_demotask:
+err_drawing:
 	vSemaphoreDelete(buttons.lock);
 err_bufferswap:
     vTaskDelete(StateMachine);
