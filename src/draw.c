@@ -14,26 +14,29 @@
 
 void vDraw(void *pvParameters)
 {
-    //define Circle Object pramteters
+    //for Synchroninzing
+    TickType_t xLastWakeTime, prevWakeTime;
+    xLastWakeTime = xTaskGetTickCount();
+    prevWakeTime = xLastWakeTime;
+    const TickType_t updatePeriod = 10;
+
+    ///define Parameters of shapes
+    // Circle
     coord_t startingPoint_circle = {SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2 };
     unsigned short radius = 30;
 
-    //CREATE OBJECT
-    circle_t *red_circle = createCircle(startingPoint_circle, radius, Red);
-
-    //define Square Object pramteters
+    //Square
     coord_t startingPoint_square = {3 * SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2 };
     signed short square_width = 60;
     signed short square_height = 60;
 
-    //CREATE OBJECT
-    square_t *blue_square = createSquare(startingPoint_square, square_width, square_height, TUMBlue );
-    
-    //define Triangle Object pramteters
+    //Triangle
     coord_t startingPoint_triangle = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
     coord_t corners[3] = {{-25,-23},{0,23},{25,-23}};
 
-    //CREATE OBJECT
+    //CREATE OBJECTs
+    circle_t *red_circle = createCircle(startingPoint_circle, radius, Red);
+    square_t *blue_square = createSquare(startingPoint_square, square_width, square_height, TUMBlue );
     triangle_t *orange_triangle = createTriangle(startingPoint_triangle, corners, Orange);
 
     //Transfers the drawing ability to the calling thread/taskd
@@ -55,12 +58,15 @@ void vDraw(void *pvParameters)
         if(!drawTriangle(orange_triangle))
            drawTriangle(orange_triangle);
 
-        //moveShape(&(red_circle->shape), 20);
-        setSpeed(&(red_circle->shape),15,15);// (float) red_circle->shape.location.x * sin(2*M_PI*1/50), (float) red_circle->shape.location.x * sin(2*M_PI*1/50));
+        moveShape(&(red_circle->shape), xLastWakeTime - prevWakeTime);
+        
+        setSpeed(&(red_circle->shape), 500*sin(2*M_PI * (red_circle->shape.dx+10) / 500), 0);// 500*cos(2*M_PI * (red_circle->shape.dy+10) / 500));
 
         tumDrawUpdateScreen();
 
-        vTaskDelay((TickType_t) 1000);
+        //Update last synch time
+        prevWakeTime = xLastWakeTime;
+        vTaskDelayUntil(&xLastWakeTime, updatePeriod);
 
     }
 
