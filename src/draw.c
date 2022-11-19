@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include"math.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -9,7 +10,6 @@
 #include "TUM_Font.h"
 
 #include"shapes.h"
-
 
 
 void vDraw(void *pvParameters)
@@ -28,9 +28,7 @@ void vDraw(void *pvParameters)
 
     //CREATE OBJECT
     square_t *blue_square = createSquare(startingPoint_square, square_width, square_height, TUMBlue );
-    // signed short x_s = ((2 * SCREEN_WIDTH) / 3 ) - w / 2;
-    // signed short y_s = (SCREEN_HEIGHT / 2) - w / 2;
-
+    
     //define Triangle Object pramteters
     coord_t startingPoint_triangle = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
     coord_t corners[3] = {{-25,-23},{0,23},{25,-23}};
@@ -46,6 +44,8 @@ void vDraw(void *pvParameters)
 
         tumEventFetchEvents(FETCH_EVENT_NONBLOCK); // Query events backend for new events, ie. button presses
 
+        tumDrawClear(White);
+
         if(!drawCircle(red_circle))
             drawCircle(red_circle);
 
@@ -55,7 +55,11 @@ void vDraw(void *pvParameters)
         if(!drawTriangle(orange_triangle))
            drawTriangle(orange_triangle);
 
+        //moveShape(&(red_circle->shape), 20);
+        setSpeed(&(red_circle->shape),15,15);// (float) red_circle->shape.location.x * sin(2*M_PI*1/50), (float) red_circle->shape.location.x * sin(2*M_PI*1/50));
+
         tumDrawUpdateScreen();
+
         vTaskDelay((TickType_t) 1000);
 
     }

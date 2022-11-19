@@ -5,6 +5,7 @@
 #include"TUM_Draw.h"
 
 typedef struct shape {
+
     coord_t pixelLocation;  /**< Pixel coord on screen */
     coord_t location; /**< Absolute location */
     float dx; /**< X axis speed in pixels/second */
@@ -49,5 +50,9 @@ int drawCircle(circle_t* );
 int drawSquare(square_t* );
 
 int drawTriangle(triangle_t* );
+
+void moveShape(shape_t* , unsigned int );
+
+void setSpeed(shape_t* , float ,float );
 
 #endif //__SHAPES_H__

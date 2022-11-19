@@ -20,7 +20,7 @@ circle_t *createCircle(coord_t initial_location, unsigned short radius,
     ret->shape.pixelLocation = initial_location;
     ret->shape.colour = colour;
     ret->shape.dx = 0;
-    ret->shape.dy = 5;    
+    ret->shape.dy = -0;    
     ret->radius = radius;
 
     return ret;
@@ -93,9 +93,14 @@ int drawTriangle(triangle_t *triangle){
 }
 
 void moveShape(shape_t* shape, unsigned int milli_seconds){
-    float update_interval = milli_seconds / 1000.0;
-    shape->location.x += shape->dx * update_interval;
-    shape->location.y += shape->dy * update_interval;
-    shape->pixelLocation.x = round(shape->location.x);
-    shape->pixelLocation.y = round(shape->location.y);
- }
+float update_interval = milli_seconds / 1000.0;
+shape->location.x += shape->dx * update_interval;
+shape->location.y += shape->dy * update_interval;
+shape->pixelLocation.x = round(shape->location.x);
+shape->pixelLocation.y = round(shape->location.y);
+}
+
+void setSpeed(shape_t* shape, float speed_x,float speed_y){
+    shape->dx = speed_x;
+    shape->dy = speed_y;
+}
