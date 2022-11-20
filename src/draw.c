@@ -21,9 +21,8 @@ extern SemaphoreHandle_t ScreenLock;
 void vDraw(void *pvParameters)
 {
     //for Synchroninzing
-    TickType_t xLastWakeTime, prevWakeTime;
+    TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
-    prevWakeTime = xLastWakeTime;
     const TickType_t updatePeriod = 10;
 
     ///define Parameters of shapes
@@ -49,7 +48,7 @@ void vDraw(void *pvParameters)
     tumDrawBindThread();
 
 
-    coord_t offset = {0,0};
+    static coord_t offset = {0,0};
     float rad=0;
     int ROTATION_RADIUS = abs(SCREEN_CENTER.x - startingPoint_circle.x);
 
@@ -58,57 +57,51 @@ void vDraw(void *pvParameters)
     static char string_dynamic[20]= "Moving Text";
 	static int string_dynamic_width = 0;
     static char string_mouse_position[100];
-    static char mous_leftbutton_state ;
+    static coord_t mouse_location;
 
-    button_t mybuttons[4];
-    mybuttons[0] = createButton('A',(coord_t) {SCREEN_WIDTH/8, SCREEN_HEIGHT/10});
-    mybuttons[1] = createButton('B',(coord_t) {2*SCREEN_WIDTH/8, SCREEN_HEIGHT/10});
-    mybuttons[2] = createButton('C',(coord_t) {3*SCREEN_WIDTH/8, SCREEN_HEIGHT/10});
-    mybuttons[3] = createButton('D',(coord_t) {4*SCREEN_WIDTH/8, SCREEN_HEIGHT/10});   
-    
+    // Button Objects
+    int button_keycodes[4] = {KEYCODE(A),KEYCODE(B),KEYCODE(C),KEYCODE(D)};
+    createButtonObject('A', (coord_t) {SCREEN_WIDTH/8, SCREEN_HEIGHT/10}, KEYCODE(A));
+    createButtonObject('B', (coord_t) {2*SCREEN_WIDTH/8, SCREEN_HEIGHT/10}, KEYCODE(B));
+    createButtonObject('C', (coord_t) {3*SCREEN_WIDTH/8, SCREEN_HEIGHT/10}, KEYCODE(C));
+    createButtonObject('D', (coord_t) {4*SCREEN_WIDTH/8, SCREEN_HEIGHT/10}, KEYCODE(D));
 
     while (1) {
         
         tumEventFetchEvents(FETCH_EVENT_NONBLOCK); // Query events backend for new events, ie. button presses
         
-        xGetButtonInput(); // Update global input
+        xGetButtonInput(); // Update global input 
 
         if (xSemaphoreTake(buttons.lock, 0) == pdTRUE) {
-			if (buttons.buttons[KEYCODE(Q)]) { // Equiv to SDL_SCANCODE_Q
+			if (buttons.currentState[KEYCODE(Q)]) { // Equiv to SDL_SCANCODE_Q
 				exit(EXIT_SUCCESS);
 			}
-			if (buttons.buttons[KEYCODE(A)]) { // Equiv to SDL_SCANCODE_Q
-				mybuttons->counter++;
-			}
-			if (buttons.buttons[KEYCODE(B)]) { // Equiv to SDL_SCANCODE_Q
-				(mybuttons+1)->counter++;
-			}
-			if (buttons.buttons[KEYCODE(C)]) { // Equiv to SDL_SCANCODE_Q
-                (mybuttons+1)->counter++;			
-            }
-			if (buttons.buttons[KEYCODE(D)]) { // Equiv to SDL_SCANCODE_Q
-                (mybuttons+1)->counter++;
-			}
+            checkButton(KEYCODE(A));
+            checkButton(KEYCODE(B));
+            checkButton(KEYCODE(C));
+            checkButton(KEYCODE(D));
 
 			xSemaphoreGive(buttons.lock);
 		}
 
         if (tumEventGetMouseLeft()){
             for (int i=0; i<4; i++){
-                (mybuttons+i)->counter = 0;
+                buttons.counter[button_keycodes[i]] = 0;
             }
         }
-            
+
+        mouse_location = (coord_t) {tumEventGetMouseX(), tumEventGetMouseY()};            
+
+        tumDrawSetGlobalXOffset	( mouse_location.x - SCREEN_CENTER.x );
+        tumDrawSetGlobalYOffset	( mouse_location.y - SCREEN_CENTER.y );
+
         tumDrawClear(White);
         
         if(!drawCircle(red_circle))
-            drawCircle(red_circle);
 
         if(!drawSquare(blue_square))
-            drawSquare(blue_square);
 
         if(!drawTriangle(orange_triangle))
-           drawTriangle(orange_triangle);
 
         // Static Text 
         if (!tumGetTextSize((char *)string_static,
@@ -143,18 +136,15 @@ void vDraw(void *pvParameters)
         
         //Draw Buttons 
         for (int i=0; i<4; i++){
-           drawButton(mybuttons+i);
+           drawButton(button_keycodes[i]);
          }
         //Print Mouse Coordinates
-        sprintf(string_mouse_position, "Mouse position: X: %d | Y: %d", 
-            tumEventGetMouseX(), tumEventGetMouseY()); 
+        sprintf(string_mouse_position, "Mouse position: X: %d | Y: %d", mouse_location.x, mouse_location.y); 
             tumDrawText(string_mouse_position, 20, 10, Black);
-
 
         tumDrawUpdateScreen();
 
         //Update last synch time
-        prevWakeTime = xLastWakeTime;
         vTaskDelayUntil(&xLastWakeTime, updatePeriod);
 
     }

@@ -5,7 +5,7 @@ buttons_buffer_t buttons = { 0 };
 void xGetButtonInput(void)
 {
 	if (xSemaphoreTake(buttons.lock, 0) == pdTRUE) {
-		xQueueReceive(buttonInputQueue, &buttons.buttons, 0);
+		xQueueReceive(buttonInputQueue, &buttons.currentState, 0);
 		xSemaphoreGive(buttons.lock);
 	}
 }
@@ -26,25 +26,29 @@ void buttonsExit(void)
     vSemaphoreDelete(buttons.lock);
 }
 
-void drawButton(button_t* this_button){
+void drawButton(int keyvalue){
     char string_tmp[100];
-    sprintf(string_tmp,"%c: %d", this_button->id, this_button->counter);
-    tumDrawText(string_tmp, this_button->pos.x, 
-                this_button->pos.y, Black);
+    sprintf(string_tmp,"%c: %d", buttons.id[keyvalue], buttons.counter[keyvalue]);
+    tumDrawText(string_tmp, buttons.pos[keyvalue].x, 
+                buttons.pos[keyvalue].y, buttons.colour[keyvalue]);
 }
 
-button_t createButton(char id, coord_t pos){
+void createButtonObject(char id, coord_t pos, int keyvalue){
+    buttons.id[keyvalue] = id;
+    buttons.colour[keyvalue] = Black;
+    buttons.counter[keyvalue] = 0;
+    buttons.pos[keyvalue] = pos;
+}
 
-    button_t *ret = calloc(1, sizeof(button_t));
-
-    if (!ret) {
-        fprintf(stderr, "Creating ball failed\n");
-        exit(EXIT_FAILURE);
+void checkButton(int keyvalue){
+    if (buttons.currentState[keyvalue]) { // Equiv to SDL_SCANCODE_Q
+        TickType_t now = xTaskGetTickCount();
+        if ( buttons.currentState[keyvalue] > 0 && buttons.prevState[keyvalue] == 0){
+            if ((now - buttons.lastTimePressed[keyvalue]) > DEBOUNCEDELAY ){
+                buttons.counter[keyvalue]++;
+                buttons.lastTimePressed[keyvalue] = now;
+            }
+        }
     }
-
-    ret->id = id;
-    ret->pos = pos;
-    ret->counter = 0;
-    
-    return *ret;
+    buttons.prevState[keyvalue] = buttons.currentState[keyvalue];
 }
