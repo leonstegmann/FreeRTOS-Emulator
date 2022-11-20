@@ -15,7 +15,6 @@ typedef struct shape {
 
 } shape_t;
 
-
 typedef struct circle {
 
     shape_t shape; /**< Inheriting properties from struct shape*/
@@ -23,14 +22,12 @@ typedef struct circle {
  
 } circle_t;
 
-
 typedef struct triangle {
 
     shape_t shape; /**< Inheriting properties from struct shape*/
     coord_t corners[3];
 
 } triangle_t;
-
 
 typedef struct square {
 
@@ -55,5 +52,12 @@ int drawTriangle(triangle_t* );
 void moveShape(shape_t* , unsigned int );
 
 void setSpeed(shape_t* , float ,float );
+
+void updateLocation(shape_t* shape, coord_t offset){
+    shape->location.x = SCREEN_CENTER.x + offset.x;
+    shape->location.y = shape->starting_position.y + offset.y;
+    shape->pixelLocation.x = round(shape->location.x);
+    shape->pixelLocation.y = round(shape->location.y);
+}
 
 #endif //__SHAPES_H__

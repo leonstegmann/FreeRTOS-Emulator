@@ -18,19 +18,6 @@ static coord_t SCREEN_CENTER = {SCREEN_WIDTH/2 , SCREEN_HEIGHT/2};
 
 extern SemaphoreHandle_t ScreenLock;
 
-void rotateShape(shape_t* shape, coord_t origin){
-    shape->location.x = SCREEN_CENTER.x + (origin.x-SCREEN_CENTER.x) * sin(2*M_PI * (shape->location.x +10) / 1000);
-//    shape->location.y += origin.y; 
-    shape->pixelLocation.x = round(shape->location.x);
-    shape->pixelLocation.y = round(shape->location.y);
-}
-
-void updateLocation(shape_t* shape, coord_t offset){
-    shape->location.x = SCREEN_CENTER.x + offset.x;
-    shape->location.y = shape->starting_position.y + offset.y;
-    shape->pixelLocation.x = round(shape->location.x);
-    shape->pixelLocation.y = round(shape->location.y);
-}
 
 void vDraw(void *pvParameters)
 {
