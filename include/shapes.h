@@ -53,11 +53,7 @@ void moveShape(shape_t* , unsigned int );
 
 void setSpeed(shape_t* , float ,float );
 
-void updateLocation(shape_t* shape, coord_t offset){
-    shape->location.x = SCREEN_CENTER.x + offset.x;
-    shape->location.y = shape->starting_position.y + offset.y;
-    shape->pixelLocation.x = round(shape->location.x);
-    shape->pixelLocation.y = round(shape->location.y);
-}
+void updateLocation(shape_t*, coord_t);
+
 
 #endif //__SHAPES_H__

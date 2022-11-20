@@ -11,10 +11,9 @@
 #include "TUM_Event.h"
 #include "TUM_Font.h"
 
-
+#include"draw.h"
 #include"shapes.h"
-
-static coord_t SCREEN_CENTER = {SCREEN_WIDTH/2 , SCREEN_HEIGHT/2}; 
+#include"buttons.h"
 
 extern SemaphoreHandle_t ScreenLock;
 
@@ -54,16 +53,43 @@ void vDraw(void *pvParameters)
     float rad=0;
     int ROTATION_RADIUS = abs(SCREEN_CENTER.x - startingPoint_circle.x);
 
-    static char string_static[20]= "Random Text";
+    static char string_static[20] = "Random Text";
 	static int string_static_width = 0;
     static char string_dynamic[20]= "Moving Text";
 	static int string_dynamic_width = 0;
+
+     button_t mybuttons[4];
+    mybuttons[0] = createButton('A',(coord_t) {SCREEN_WIDTH/8, SCREEN_HEIGHT/10});
+    mybuttons[1] = createButton('B',(coord_t) {2*SCREEN_WIDTH/8, SCREEN_HEIGHT/10});
+    mybuttons[2] = createButton('C',(coord_t) {3*SCREEN_WIDTH/8, SCREEN_HEIGHT/10});
+    mybuttons[3] = createButton('D',(coord_t) {4*SCREEN_WIDTH/8, SCREEN_HEIGHT/10});   
     
 
     while (1) {
         
         tumEventFetchEvents(FETCH_EVENT_NONBLOCK); // Query events backend for new events, ie. button presses
+        
+        xGetButtonInput(); // Update global input
 
+        if (xSemaphoreTake(buttons.lock, 0) == pdTRUE) {
+			if (buttons.buttons[KEYCODE(Q)]) { // Equiv to SDL_SCANCODE_Q
+				exit(EXIT_SUCCESS);
+			}
+			if (buttons.buttons[KEYCODE(A)]) { // Equiv to SDL_SCANCODE_Q
+				mybuttons->counter++;
+			}
+			if (buttons.buttons[KEYCODE(B)]) { // Equiv to SDL_SCANCODE_Q
+				(mybuttons+1)->counter++;
+			}
+			if (buttons.buttons[KEYCODE(C)]) { // Equiv to SDL_SCANCODE_Q
+                (mybuttons+1)->counter++;			
+            }
+			if (buttons.buttons[KEYCODE(D)]) { // Equiv to SDL_SCANCODE_Q
+                (mybuttons+1)->counter++;
+			}
+
+			xSemaphoreGive(buttons.lock);
+		}
         tumDrawClear(White);
         
         if(!drawCircle(red_circle))
@@ -89,7 +115,7 @@ void vDraw(void *pvParameters)
 				    &string_dynamic_width, NULL))
 			tumDrawText(string_dynamic,
                     SCREEN_CENTER.x - string_dynamic_width / 2 + + offset.x,
-				    1*SCREEN_HEIGHT/4 - DEFAULT_FONT_SIZE / 2,
+				    SCREEN_HEIGHT/4 - DEFAULT_FONT_SIZE / 2,
 				    TUMBlue);
 
 
@@ -105,6 +131,12 @@ void vDraw(void *pvParameters)
 
         updateLocation(&(red_circle->shape), offset);
         updateLocation(&(blue_square->shape), (coord_t) {-offset.x, -offset.y});
+        
+        //Draw Buttons 
+        for (int i=0; i<4; i++){
+           drawButton(mybuttons+i);
+         }
+
 
         tumDrawUpdateScreen();
 

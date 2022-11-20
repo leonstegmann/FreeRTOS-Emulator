@@ -5,6 +5,7 @@
 #include"TUM_Draw.h"
 
 #include"shapes.h"
+#include"draw.h"
 
 circle_t *createCircle(coord_t initial_location, unsigned short radius,
                    unsigned int colour)
@@ -106,4 +107,11 @@ void moveShape(shape_t* shape, unsigned int milli_seconds){
 void setSpeed(shape_t* shape, float speed_x, float speed_y){
     shape->dx = speed_x;
     shape->dy = speed_y;
+}
+
+void updateLocation(shape_t* shape, coord_t offset){
+    shape->location.x = SCREEN_CENTER.x + offset.x;
+    shape->location.y = shape->starting_position.y + offset.y;
+    shape->pixelLocation.x = round(shape->location.x);
+    shape->pixelLocation.y = round(shape->location.y);
 }

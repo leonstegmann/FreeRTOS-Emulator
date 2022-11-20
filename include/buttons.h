@@ -6,6 +6,10 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 
+#include"TUM_Draw.h"
+#include "TUM_Event.h"
+#include "TUM_Print.h"
+
 #define KEYCODE(CHAR) SDL_SCANCODE_##CHAR
 
 typedef struct buttons_buffer {
@@ -18,5 +22,15 @@ extern buttons_buffer_t buttons;
 void xGetButtonInput(void);
 int buttonsInit(void);
 void buttonsExit(void);
+
+typedef struct button{
+    char id;
+    coord_t pos;
+    unsigned short counter;
+} button_t;
+
+void drawButton(button_t* );
+
+button_t createButton(char , coord_t );
 
 #endif //__BUTTONS_H__
