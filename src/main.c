@@ -22,25 +22,14 @@
 #include "AsyncIO.h"
 
 #include "draw.h"
+#include"buttons.h"
 
 #define mainGENERIC_PRIORITY (tskIDLE_PRIORITY)
 #define mainGENERIC_STACK_SIZE ((unsigned short)2560)
+
 static TaskHandle_t Draw = NULL;
 
-typedef struct buttons_buffer {
-	unsigned char buttons[SDL_NUM_SCANCODES];
-	SemaphoreHandle_t lock;
-} buttons_buffer_t;
 
-static buttons_buffer_t buttons = { 0 };
-
-void xGetButtonInput(void)
-{
-	if (xSemaphoreTake(buttons.lock, 0) == pdTRUE) {
-		xQueueReceive(buttonInputQueue, &buttons.buttons, 0);
-		xSemaphoreGive(buttons.lock);
-	}
-}
 
 #define KEYCODE(CHAR) SDL_SCANCODE_##CHAR
 
