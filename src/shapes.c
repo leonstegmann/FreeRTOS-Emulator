@@ -18,6 +18,7 @@ circle_t *createCircle(coord_t initial_location, unsigned short radius,
 
     ret->shape.location = initial_location;
     ret->shape.pixelLocation = initial_location;
+    ret->shape.starting_position = initial_location;
     ret->shape.colour = colour;
     ret->shape.dx = 0;
     ret->shape.dy = -0;    
@@ -38,6 +39,7 @@ square_t *createSquare(coord_t initial_location,  unsigned short initial_width,
 
     ret->shape.location = initial_location;
     ret->shape.pixelLocation = initial_location;
+    ret->shape.starting_position = initial_location;
     ret->shape.colour = colour;
     ret->shape.dx = 0;
     ret->shape.dy = 0;    
@@ -59,6 +61,7 @@ triangle_t *createTriangle(coord_t initial_location, coord_t* initial_corners,
 
     ret->shape.location = initial_location;
     ret->shape.pixelLocation = initial_location;
+    ret->shape.starting_position = initial_location;
     ret->shape.colour = colour;
     ret->shape.dx = 0;
     ret->shape.dy = 0;    
@@ -70,14 +73,14 @@ triangle_t *createTriangle(coord_t initial_location, coord_t* initial_corners,
 }
 
 int drawCircle(circle_t *circle){
-    tumDrawCircle( circle->shape.location.x, circle->shape.location.y,
+    tumDrawCircle( circle->shape.pixelLocation.x, circle->shape.pixelLocation.y,
                     circle->radius, circle->shape.colour);
     return 0;
 }
 
 int drawSquare(square_t *square){
-    tumDrawFilledBox( square->shape.location.x - square->width/2,
-                        square->shape.location.y - square->height/2,
+    tumDrawFilledBox( square->shape.pixelLocation.x - square->width/2,
+                        square->shape.pixelLocation.y - square->height/2,
                         square->width, square->height, square->shape.colour);
     return 0;
 }
@@ -85,8 +88,8 @@ int drawSquare(square_t *square){
 int drawTriangle(triangle_t *triangle){
     coord_t coordsCentered[3];
     for (int i=0; i<3; i++){
-        coordsCentered[i].x = triangle->corners[i].x + triangle->shape.location.x ;
-        coordsCentered[i].y = triangle->corners[i].y + triangle->shape.location.y ;
+        coordsCentered[i].x = triangle->corners[i].x + triangle->shape.pixelLocation.x ;
+        coordsCentered[i].y = triangle->corners[i].y + triangle->shape.pixelLocation.y ;
     }
     tumDrawTriangle(coordsCentered, triangle->shape.colour);
     return 0;

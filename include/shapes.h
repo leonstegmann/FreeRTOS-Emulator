@@ -6,6 +6,7 @@
 
 typedef struct shape {
 
+    coord_t starting_position;
     coord_t pixelLocation;  /**< Pixel coord on screen */
     coord_t location; /**< Absolute location */
     float dx; /**< X axis speed in pixels/second */
