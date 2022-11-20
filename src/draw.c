@@ -57,8 +57,10 @@ void vDraw(void *pvParameters)
 	static int string_static_width = 0;
     static char string_dynamic[20]= "Moving Text";
 	static int string_dynamic_width = 0;
+    static char string_mouse_position[100];
+    static char mous_leftbutton_state ;
 
-     button_t mybuttons[4];
+    button_t mybuttons[4];
     mybuttons[0] = createButton('A',(coord_t) {SCREEN_WIDTH/8, SCREEN_HEIGHT/10});
     mybuttons[1] = createButton('B',(coord_t) {2*SCREEN_WIDTH/8, SCREEN_HEIGHT/10});
     mybuttons[2] = createButton('C',(coord_t) {3*SCREEN_WIDTH/8, SCREEN_HEIGHT/10});
@@ -90,6 +92,13 @@ void vDraw(void *pvParameters)
 
 			xSemaphoreGive(buttons.lock);
 		}
+
+        if (tumEventGetMouseLeft()){
+            for (int i=0; i<4; i++){
+                (mybuttons+i)->counter = 0;
+            }
+        }
+            
         tumDrawClear(White);
         
         if(!drawCircle(red_circle))
@@ -136,6 +145,10 @@ void vDraw(void *pvParameters)
         for (int i=0; i<4; i++){
            drawButton(mybuttons+i);
          }
+        //Print Mouse Coordinates
+        sprintf(string_mouse_position, "Mouse position: X: %d | Y: %d", 
+            tumEventGetMouseX(), tumEventGetMouseY()); 
+            tumDrawText(string_mouse_position, 20, 10, Black);
 
 
         tumDrawUpdateScreen();
