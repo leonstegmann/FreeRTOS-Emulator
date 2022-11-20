@@ -65,7 +65,7 @@ void vDraw(void *pvParameters)
 
     coord_t offset = {0,0};
     float rad=0;
-    int ROTATION_RADIUS = SCREEN_CENTER.x - startingPoint_circle.x;
+    int ROTATION_RADIUS = abs(SCREEN_CENTER.x - startingPoint_circle.x);
 
     static char string_static[20]= "Random Text";
 	static int string_static_width = 0;
@@ -117,12 +117,7 @@ void vDraw(void *pvParameters)
                 rad += 0.03;
 
         updateLocation(&(red_circle->shape), offset);
-
-        //rotateShape(&(red_circle->shape), startingPoint_circle);
-
-        //moveShape(&(red_circle->shape), xLastWakeTime - prevWakeTime);
-        
-        //setSpeed(&(red_circle->shape), 500*sin(2*M_PI * (red_circle->shape.dx+10) / 500), 0);// 500*cos(2*M_PI * (red_circle->shape.dy+10) / 500));
+        updateLocation(&(blue_square->shape), (coord_t) {-offset.x, -offset.y});
 
         tumDrawUpdateScreen();
 
