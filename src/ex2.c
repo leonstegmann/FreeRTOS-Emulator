@@ -18,7 +18,7 @@
 extern SemaphoreHandle_t ScreenLock;
 
 
-void vDraw(void *pvParameters)
+void vExercise2(void *pvParameters)
 {
     //for Synchroninzing
     TickType_t xLastWakeTime;
@@ -26,25 +26,25 @@ void vDraw(void *pvParameters)
     const TickType_t updatePeriod = 10;
 
     ///define Parameters of shapes
-    // Circle
+    /// Circle
     coord_t startingPoint_circle = {SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2 };
     unsigned short radius = 30;
 
-    //Square
+    ///Square
     coord_t startingPoint_square = {3 * SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2 };
     signed short square_width = 60;
     signed short square_height = 60;
 
-    //Triangle
+    ///Triangle
     coord_t startingPoint_triangle = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
     coord_t corners[3] = {{-25,-23},{0,23},{25,-23}};
 
-    //CREATE OBJECTs
+    ///CREATE OBJECTs
     circle_t *red_circle = createCircle(startingPoint_circle, radius, Red);
     square_t *blue_square = createSquare(startingPoint_square, square_width, square_height, TUMBlue );
     triangle_t *orange_triangle = createTriangle(startingPoint_triangle, corners, Orange);
 
-    //Transfers the drawing ability to the calling thread/taskd
+    //7Transfers the drawing ability to the calling thread/taskd
     tumDrawBindThread();
 
 

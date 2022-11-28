@@ -27,8 +27,8 @@ int main(int argc, char *argv[])
 		goto err_buttons_lock;
 	}
 
-	if (xTaskCreate(vDraw, "Draw_exercise_2", mainGENERIC_STACK_SIZE * 2, NULL,
-                    mainGENERIC_PRIORITY, &Draw) != pdPASS) {
+	if (xTaskCreate(vExercise2, "Draw_exercise_2", mainGENERIC_STACK_SIZE * 2, NULL,
+                    mainGENERIC_PRIORITY, &ex2_handle) != pdPASS) {
 		goto err_drawing;
 	}
 

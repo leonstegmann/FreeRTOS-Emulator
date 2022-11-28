@@ -7,15 +7,18 @@
 #ifndef __BUTTONS_H__
 #define __BUTTONS_H__
 
+/* FreeRTOS includes  */
 #include <SDL2/SDL_scancode.h>
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include"task.h"
 
+/* TUM_Library includes  */
 #include"TUM_Draw.h"
 #include "TUM_Event.h"
 #include "TUM_Print.h"
-
+ 
+ /* Defines variables  */
 #define KEYCODE(CHAR) SDL_SCANCODE_##CHAR
 #define  DEBOUNCEDELAY (TickType_t) 50      // the debounce time
 
@@ -27,9 +30,9 @@ typedef struct buttons_buffer {
 
     unsigned char prevState[SDL_NUM_SCANCODES]; /**to be able to compare current with previous state*/
     TickType_t lastTimePressed[SDL_NUM_SCANCODES]; /** to ensure debounce time */
-    unsigned char currentState[SDL_NUM_SCANCODES];
+    unsigned char currentState[SDL_NUM_SCANCODES]; /** current button state */
     unsigned short counter[SDL_NUM_SCANCODES]; /**how often button got pressed */
-    char id[SDL_NUM_SCANCODES]; /* the ButtonName */
+    char id[SDL_NUM_SCANCODES]; /* the button name */
     coord_t pos[SDL_NUM_SCANCODES]; /* position of the button on the GUI */
     unsigned int colour[SDL_NUM_SCANCODES]; /**< Hex RGB colour */
     SemaphoreHandle_t lock; /* FreeRTOS Semaphore handle*/

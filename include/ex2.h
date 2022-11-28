@@ -4,6 +4,10 @@
 
 #define  SCREEN_CENTER (coord_t) {SCREEN_WIDTH/2 , SCREEN_HEIGHT/2} 
 
-void vDraw(void *pvParameters);
+/**
+ * @brief Exercise 2: draw objects and handles logic
+ * @param pvParameters A value that is passed as the paramater to the created task in FreeRTOS 
+ */
+void vExercise2(void *pvParameters);
 
 #endif //__EX_2__
