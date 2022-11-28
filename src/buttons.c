@@ -33,11 +33,20 @@ void drawButton(int keyvalue){
                 buttons.pos[keyvalue].y, buttons.colour[keyvalue]);
 }
 
-void createButtonObject(char id, coord_t pos, int keyvalue){
-    buttons.id[keyvalue] = id;
-    buttons.colour[keyvalue] = Black;
-    buttons.counter[keyvalue] = 0;
+void setDisplayedButtonName(char id, int keyvalue){
+    buttons.id[keyvalue]= id;
+}
+
+void setButtonPosition(coord_t pos, int keyvalue){
     buttons.pos[keyvalue] = pos;
+}
+
+void setButtonColour(unsigned int colour, int keyvalue){
+    buttons.colour[keyvalue] = colour;
+}
+
+void resetCounter(int keyvalue){
+    buttons.counter[keyvalue] = 0;
 }
 
 void checkButton(int keyvalue){

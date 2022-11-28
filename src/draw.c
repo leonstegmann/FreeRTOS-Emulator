@@ -59,12 +59,18 @@ void vDraw(void *pvParameters)
     static char string_mouse_position[100];
     static coord_t mouse_location;
 
-    // Button Objects
+    // Button Objects for GUI
     int button_keycodes[4] = {KEYCODE(A),KEYCODE(B),KEYCODE(C),KEYCODE(D)};
-    createButtonObject('A', (coord_t) {SCREEN_WIDTH/8, SCREEN_HEIGHT/10}, KEYCODE(A));
-    createButtonObject('B', (coord_t) {2*SCREEN_WIDTH/8, SCREEN_HEIGHT/10}, KEYCODE(B));
-    createButtonObject('C', (coord_t) {3*SCREEN_WIDTH/8, SCREEN_HEIGHT/10}, KEYCODE(C));
-    createButtonObject('D', (coord_t) {4*SCREEN_WIDTH/8, SCREEN_HEIGHT/10}, KEYCODE(D));
+    for (int i=0; i < 4 ; i++){
+        setButtonColour(Black,button_keycodes[i]);
+        setButtonPosition((coord_t) {i*SCREEN_WIDTH/8, SCREEN_HEIGHT/10},button_keycodes[i]);
+        resetCounter(button_keycodes[i]);
+    }
+    
+    setDisplayedButtonName('A',button_keycodes[0]);
+    setDisplayedButtonName('B',button_keycodes[1]);
+    setDisplayedButtonName('C',button_keycodes[2]);
+    setDisplayedButtonName('D',button_keycodes[3]);
 
     while (1) {
         
@@ -76,11 +82,9 @@ void vDraw(void *pvParameters)
 			if (buttons.currentState[KEYCODE(Q)]) { // Equiv to SDL_SCANCODE_Q
 				exit(EXIT_SUCCESS);
 			}
-            checkButton(KEYCODE(A));
-            checkButton(KEYCODE(B));
-            checkButton(KEYCODE(C));
-            checkButton(KEYCODE(D));
-
+            for (int i=0; i < 4 ; i++){
+                checkButton(button_keycodes[i]);
+            }
 			xSemaphoreGive(buttons.lock);
 		}
 
