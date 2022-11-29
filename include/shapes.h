@@ -13,30 +13,37 @@
  * @param dy vertical speed
  * @param colour shape colour
  */
-typedef struct shape {
+typedef struct shape shape_t;
+
+/// Object structures
+typedef struct circle circle_t;
+typedef struct triangle triangle_t;
+typedef struct square square_t;
+
+struct shape {
     coord_t starting_position;
     coord_t location; /**< Absolute location */
     coord_t pixelLocation;  /**< Pixel coord on screen */
     unsigned int colour; /**< Hex RGB colour */
     float dx; /**< X axis speed in pixels/second */
     float dy; /**< Y axis speed in pixels/second */
-} shape_t;
+};
 
-typedef struct circle {
+struct circle {
     shape_t shape; /**< Inheriting properties from struct shape*/
     unsigned short radius; /**< Radius in pixels */
-} circle_t;
+};
 
-typedef struct triangle {
+struct triangle {
     shape_t shape; /**< Inheriting properties from struct shape*/
     coord_t corners[3]; /**< Coordinates of the 3 corners of a triangle */
-} triangle_t;
+};
 
-typedef struct square {
+struct square {
     shape_t shape; /**< Inheriting properties from struct shape*/
     unsigned short width; /**< Width of square */
     unsigned short height; /**< Height of square */
-} square_t;
+};
 
 /// Instantiates and initalizes the objects
 circle_t* createCircle(coord_t , unsigned short ,unsigned int );
