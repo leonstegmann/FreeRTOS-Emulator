@@ -1,11 +1,4 @@
-#include <stdio.h>
-#include"stdlib.h"
-#include"math.h"
-
-#include"TUM_Draw.h"
-
 #include"shapes.h"
-#include"ex2.h"
 
 circle_t *createCircle(coord_t initial_location, unsigned short radius,
                    unsigned int colour)
