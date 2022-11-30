@@ -1,5 +1,32 @@
 #include"main.h"
 
+/**
+ * @brief Task to swap the buffer of the screen to have a smooth user experience
+*/
+void vSwapBuffers(void *pvParameters)
+{
+    TickType_t xLastWakeTime;
+    xLastWakeTime = xTaskGetTickCount();
+    const TickType_t frameratePeriod = 1000 / FRAMERATE;
+
+    //tumDrawBindThread(); // Setup Rendering handle with correct GL context
+
+	printf("\nDebugPrint: bufferswap "); //DEBUG PRINT
+
+    while (1) {
+        tumDrawUpdateScreen();
+        tumEventFetchEvents(FETCH_EVENT_BLOCK);
+        xSemaphoreGive(DrawSignal);
+        vTaskDelayUntil(&xLastWakeTime,
+                        pdMS_TO_TICKS(frameratePeriod));
+    }
+}
+
+/* RTOS Semaphorehandles -> Initiating  */
+SemaphoreHandle_t DrawSignal = NULL;
+SemaphoreHandle_t ScreenLock = NULL;
+SemaphoreHandle_t ex2Mutex = NULL;
+
 int main(int argc, char *argv[])
 {
 	char *bin_folder_path = tumUtilGetBinFolderPath(argv[0]);
@@ -27,16 +54,59 @@ int main(int argc, char *argv[])
 		goto err_buttons_lock;
 	}
 
-	if (xTaskCreate(vExercise2, "Draw_exercise_2", mainGENERIC_STACK_SIZE * 2, NULL,
-                    mainGENERIC_PRIORITY, &ex2_handle) != pdPASS) {
-		goto err_drawing;
+	DrawSignal = xSemaphoreCreateBinary();
+    if (!DrawSignal) {
+        PRINT_ERROR("Failed to create draw signal");
+        goto err_draw_signal;
+    }
+
+    ScreenLock = xSemaphoreCreateMutex();
+    if (!ScreenLock) {
+        PRINT_ERROR("Failed to create screen lock");
+        goto err_screen_lock;
+    }
+
+	ex2Mutex = xSemaphoreCreateMutex();
+    if (!ex2Mutex) {
+        PRINT_ERROR("Failed to create exercise2 semaphore");
+        goto err_ex2mutex;
+    }
+	printf("\nInitialization SUCCESS!! \nMoving on to create tasks \n");    
+
+/*-----------------------------------------------------------------------------------------------*/	
+	/* FreeRTOS Task creation*/
+/*	if (xTaskCreate(vSwapBuffers, "BufferSwapTask",
+                    mainGENERIC_STACK_SIZE * 2, NULL, configMAX_PRIORITIES,
+                    &BufferSwap) != pdPASS) {
+        goto err_bufferswap;
 	}
+*/
+	if (xTaskCreate(vExercise2, "Exercise_2", mainGENERIC_STACK_SIZE * 2, NULL,
+                    mainGENERIC_PRIORITY, &ex2_handle) != pdPASS) {
+		goto err_ex2;
+	}
+	tumFUtilPrintTaskStateList();
+	
+/*-----------------------------------------------------------------------------------------------*/	
+	/* start FreeRTOS Sceduler: Should never get passed this function */
 
-	vTaskStartScheduler();
+	vTaskStartScheduler(); 
+	
+	atexit(aIODeinit);
 
-	return EXIT_SUCCESS;
+	return EXIT_SUCCESS; // Return State Main
 
-err_drawing:
+/*-----------------------------------------------------------------------------------------------*/	
+/* Error handling -> delete everything that has been initialized so far (Backwards the Init Order)*/
+err_ex2:
+	vTaskDelete(BufferSwap); // Delete TaskHandle
+err_bufferswap:
+	vSemaphoreDelete(ex2_handle);
+err_ex2mutex:
+	vSemaphoreDelete(ScreenLock);
+err_screen_lock:
+	vSemaphoreDelete(DrawSignal);
+err_draw_signal:
 	vSemaphoreDelete(buttons.lock);
 err_buttons_lock:
 	tumSoundExit();
@@ -45,9 +115,11 @@ err_init_audio:
 err_init_events:
 	tumDrawExit();
 err_init_drawing:
-	return EXIT_FAILURE;
+
+	return EXIT_FAILURE; // Return State Main
 }
 
+/*-----------------------------------------------------------------------------------------------*/	
 // cppcheck-suppress unusedFunction
 __attribute__((unused)) void vMainQueueSendPassed(void)
 {

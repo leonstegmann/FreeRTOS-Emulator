@@ -1,25 +1,9 @@
-#include <stdio.h>
-#include"math.h"
-
-#include "FreeRTOS.h"
-#include "queue.h"
-#include "semphr.h"
-#include "task.h"
-
-#include "TUM_Draw.h"
-#include "TUM_Ball.h"
-#include "TUM_Event.h"
-#include "TUM_Font.h"
-
 #include"ex2.h"
-#include"shapes.h"
-#include"buttons.h"
 
-extern SemaphoreHandle_t ScreenLock;
-
+/*-----------------------------------------------------------------------------------------------*/	
 
 void vExercise2(void *pvParameters)
-{
+{   
     //for Synchroninzing
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
@@ -44,7 +28,7 @@ void vExercise2(void *pvParameters)
     square_t *blue_square = createSquare(startingPoint_square, square_width, square_height, TUMBlue );
     triangle_t *orange_triangle = createTriangle(startingPoint_triangle, corners, Orange);
 
-    //7Transfers the drawing ability to the calling thread/taskd
+    //Transfers the drawing ability to the calling thread/taskd
     tumDrawBindThread();
 
 
@@ -73,84 +57,95 @@ void vExercise2(void *pvParameters)
     setDisplayedButtonName('D',button_keycodes[3]);
 
     while (1) {
-        
-        tumEventFetchEvents(FETCH_EVENT_NONBLOCK); // Query events backend for new events, ie. button presses
-        
-        xGetButtonInput(); // Update global input 
+        if(DrawSignal)
+            /* so no other task can draw at the same time */
+            //xSemaphoreTake(ex2Mutex, portMAX_DELAY);
+            if(xSemaphoreTake(DrawSignal, 10) == pdTRUE);
 
-        if (xSemaphoreTake(buttons.lock, 0) == pdTRUE) {
-			if (buttons.currentState[KEYCODE(Q)]) { // Equiv to SDL_SCANCODE_Q
-				exit(EXIT_SUCCESS);
-			}
-            for (int i=0; i < 4 ; i++){
-                checkButton(button_keycodes[i]);
+            tumEventFetchEvents(FETCH_EVENT_NONBLOCK); // Query events backend for new events, ie. button presses
+
+            xGetButtonInput(); // Update global input 
+
+            if (xSemaphoreTake(buttons.lock, 0) == pdTRUE) {
+                if (buttons.currentState[KEYCODE(Q)]) { // Equiv to SDL_SCANCODE_Q
+                    exit(EXIT_SUCCESS);
+                }
+                for (int i=0; i < 4 ; i++){
+                    checkButton(button_keycodes[i]);
+                }
+                xSemaphoreGive(buttons.lock);
             }
-			xSemaphoreGive(buttons.lock);
-		}
 
-        if (tumEventGetMouseLeft()){
+            if (tumEventGetMouseLeft()){
+                for (int i=0; i<4; i++){
+                    buttons.counter[button_keycodes[i]] = 0;
+                }
+            }
+
+            mouse_location = (coord_t) {tumEventGetMouseX(), tumEventGetMouseY()};            
+
+            tumDrawSetGlobalXOffset	( mouse_location.x - SCREEN_CENTER.x );
+            tumDrawSetGlobalYOffset	( mouse_location.y - SCREEN_CENTER.y );
+
+            //Calculate rotational Offset
+            offset.x = (int) (ROTATION_RADIUS * sin(rad));
+            offset.y = (int) (ROTATION_RADIUS * cos(rad));
+        
+            //Increment Rotation
+            if(rad >= 2*M_PI)
+                    rad=0;
+                else
+                    rad += 0.03;
+
+            /* take Screenlock while drawing*/
+            xSemaphoreTake(ScreenLock, portMAX_DELAY);
+
+            tumDrawClear(White);
+            
+            if(!drawCircle(red_circle))
+
+            if(!drawSquare(blue_square))
+
+            if(!drawTriangle(orange_triangle))
+
+            // Static Text 
+            if (!tumGetTextSize((char *)string_static,
+                        &string_static_width, NULL))
+                tumDrawText(string_static,
+                        SCREEN_CENTER.x -
+                            string_static_width / 2,
+                        3*SCREEN_HEIGHT/4 - DEFAULT_FONT_SIZE / 2,
+                        TUMBlue);
+
+            // Moving Text
+            if (!tumGetTextSize((char *)string_dynamic,
+                        &string_dynamic_width, NULL))
+                tumDrawText(string_dynamic,
+                        SCREEN_CENTER.x - string_dynamic_width / 2 + + offset.x,
+                        SCREEN_HEIGHT/4 - DEFAULT_FONT_SIZE / 2,
+                        TUMBlue);
+
+            updateLocation(&(red_circle->shape), offset);
+            updateLocation(&(blue_square->shape), (coord_t) {-offset.x, -offset.y});
+            
+            //Draw Buttons 
             for (int i=0; i<4; i++){
-                buttons.counter[button_keycodes[i]] = 0;
+            drawButton(button_keycodes[i]);
             }
-        }
+            
+            //Print Mouse Coordinates
+            sprintf(string_mouse_position, "Mouse position: X: %d | Y: %d", mouse_location.x, mouse_location.y); 
+                tumDrawText(string_mouse_position, 20, 10, Black);
 
-        mouse_location = (coord_t) {tumEventGetMouseX(), tumEventGetMouseY()};            
+            tumDrawUpdateScreen();
 
-        tumDrawSetGlobalXOffset	( mouse_location.x - SCREEN_CENTER.x );
-        tumDrawSetGlobalYOffset	( mouse_location.y - SCREEN_CENTER.y );
+            /* Give back Screenlock Semaphore*/
+            xSemaphoreGive(ScreenLock);
 
-        tumDrawClear(White);
+            //Update last synch time
+            vTaskDelayUntil(&xLastWakeTime, updatePeriod);
+            
+            //xSemaphoreGive(ex2Mutex);
         
-        if(!drawCircle(red_circle))
-
-        if(!drawSquare(blue_square))
-
-        if(!drawTriangle(orange_triangle))
-
-        // Static Text 
-        if (!tumGetTextSize((char *)string_static,
-				    &string_static_width, NULL))
-			tumDrawText(string_static,
-				    SCREEN_CENTER.x -
-					    string_static_width / 2,
-				    3*SCREEN_HEIGHT/4 - DEFAULT_FONT_SIZE / 2,
-				    TUMBlue);
-
-        // Moving Text
-        if (!tumGetTextSize((char *)string_dynamic,
-				    &string_dynamic_width, NULL))
-			tumDrawText(string_dynamic,
-                    SCREEN_CENTER.x - string_dynamic_width / 2 + + offset.x,
-				    SCREEN_HEIGHT/4 - DEFAULT_FONT_SIZE / 2,
-				    TUMBlue);
-
-
-        //Calculate rotational Offset
-        offset.x = (int) (ROTATION_RADIUS * sin(rad));
-        offset.y = (int) (ROTATION_RADIUS * cos(rad));
-    
-        //Increment Rotation
-        if(rad >= 2*M_PI)
-                rad=0;
-            else
-                rad += 0.03;
-
-        updateLocation(&(red_circle->shape), offset);
-        updateLocation(&(blue_square->shape), (coord_t) {-offset.x, -offset.y});
-        
-        //Draw Buttons 
-        for (int i=0; i<4; i++){
-           drawButton(button_keycodes[i]);
-         }
-        //Print Mouse Coordinates
-        sprintf(string_mouse_position, "Mouse position: X: %d | Y: %d", mouse_location.x, mouse_location.y); 
-            tumDrawText(string_mouse_position, 20, 10, Black);
-
-        tumDrawUpdateScreen();
-
-        //Update last synch time
-        vTaskDelayUntil(&xLastWakeTime, updatePeriod);
-
     }
-
 }
