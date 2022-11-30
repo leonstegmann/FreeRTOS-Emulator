@@ -1,7 +1,5 @@
 #include"ex2.h"
 
-/*-----------------------------------------------------------------------------------------------*/	
-
 void vExercise2(void *pvParameters)
 {   
     //for Synchroninzing
