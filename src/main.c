@@ -1,4 +1,4 @@
-#include"main.h"
+#include "main.h"
 
 /**
  * @brief Task to swap the buffer of the screen to have a smooth user experience
@@ -22,7 +22,12 @@ void vSwapBuffers(void *pvParameters)
     }
 }
 
-/* RTOS Semaphorehandles -> Initiating  */
+/* RTOS Taskhandles -> initializing*/
+TaskHandle_t BufferSwap = NULL;
+TaskHandle_t ex2_handle = NULL;
+TaskHandle_t ex3_t1_handle = NULL;
+
+/* RTOS Semaphorehandles -> initializing  */
 SemaphoreHandle_t DrawSignal = NULL;
 SemaphoreHandle_t ScreenLock = NULL;
 
@@ -46,6 +51,8 @@ int main(int argc, char *argv[])
 		PRINT_ERROR("Failed to initialize audio");
 		goto err_init_audio;
 	}
+
+	atexit(aIODeinit); // standart C library: passed function pointer gets calles when function exits -> ensures to clean sockets, Queues etc 
 
 	buttons.lock = xSemaphoreCreateMutex(); // Locking mechanism
 	if (!buttons.lock) {
@@ -80,10 +87,18 @@ int main(int argc, char *argv[])
 		goto err_ex2;
 	}
 
+	if (xTaskCreate(vExercise3Task1, "Exercise_3_Task_1", mainGENERIC_STACK_SIZE * 2, NULL,
+                    mainGENERIC_PRIORITY, &ex3_t1_handle) != pdPASS) {
+		goto err_ex3_t1;
+	}
+
+
+
 	tumFUtilPrintTaskStateList();
 
-	vTaskSuspend(BufferSwap);
-
+	vTaskSuspend(BufferSwap); // Task Suspended for Debug purposes
+	vTaskSuspend(ex2_handle);
+	
 	tumFUtilPrintTaskStateList();
 
 /*-----------------------------------------------------------------------------------------------*/	
@@ -97,6 +112,8 @@ int main(int argc, char *argv[])
 
 /*-----------------------------------------------------------------------------------------------*/	
 /* Error handling -> delete everything that has been initialized so far (Backwards the Init Order)*/
+err_ex3_t1:
+	vTaskDelete(ex2_handle);
 err_ex2:
 	vTaskDelete(BufferSwap); // Delete TaskHandle
 err_bufferswap:

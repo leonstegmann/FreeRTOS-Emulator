@@ -24,21 +24,18 @@
 #include "TUM_Sound.h"
 #include "TUM_Utils.h"
 #include "TUM_Font.h"
-#include"TUM_FreeRTOS_Utils.h"
+#include "TUM_FreeRTOS_Utils.h"
 
 /* Project includes  */
+#include "defines.h"
+#include "buttons.h"
 #include "ex2.h"
-#include"buttons.h"
+#include "ex3.h"
 
-/* Defines variables  */
-#define mainGENERIC_PRIORITY    (tskIDLE_PRIORITY)
-#define mainGENERIC_STACK_SIZE  ((unsigned short)2560)
-#define KEYCODE(CHAR)           SDL_SCANCODE_##CHAR     // SDL_SCANCODE for te keybord use i buttons
-#define FRAMERATE               50
-
-/* RTOS Taskhandles -> each Task has his own Reference as taskhandle. Needed to Delete Tasks */
-static TaskHandle_t ex2_handle = NULL; // FreeRTOS intern: Used to pass a handle to the created task out of the xTaskCreate() function.
-static TaskHandle_t BufferSwap = NULL; // FreeRTOS intern: Used to pass a handle to the created task out of the xTaskCreate() function.
+/* RTOS Taskhandles -> Instantiating: each Task has his own Reference as taskhandle. Needed to Delete Tasks */
+extern TaskHandle_t BufferSwap; // FreeRTOS intern: Used to pass a handle to the created task out of the xTaskCreate() function.
+extern TaskHandle_t ex2_handle; // FreeRTOS intern: Used to pass a handle to the created task out of the xTaskCreate() function.
+extern TaskHandle_t ex3_t1_handle; // FreeRTOS intern: Used to pass a handle to the created task out of the xTaskCreate() function.
 
 /* RTOS Semaphorehandles -> Instantiating  */
 extern SemaphoreHandle_t DrawSignal;
