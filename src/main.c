@@ -50,9 +50,13 @@ void vSwapBuffers(void *pvParameters)
     }
 }
 
-/* RTOS Semaphorehandles -> Initiating  */
+/* RTOS Semaphorehandles -> Initializing  */
 SemaphoreHandle_t DrawSignal = NULL;
 SemaphoreHandle_t ScreenLock = NULL;
+
+/* RTOS Taskhandles -> Initializing  */
+TaskHandle_t Ex2_handle  = NULL;
+TaskHandle_t BufferSwap_handle  = NULL;
 
 int main(int argc, char *argv[])
 {
@@ -99,23 +103,24 @@ int main(int argc, char *argv[])
 	/* FreeRTOS Task creation*/
 	if (xTaskCreate(vSwapBuffers, "BufferSwapTask",
                     mainGENERIC_STACK_SIZE * 2, NULL, configMAX_PRIORITIES,
-                    &BufferSwap) != pdPASS) {
+                    &BufferSwap_handle) != pdPASS) {
         goto err_bufferswap;
 	}
 
 	if (xTaskCreate(vExercise2, "Exercise_2", mainGENERIC_STACK_SIZE * 2, NULL,
-                    mainGENERIC_PRIORITY, &ex2_handle) != pdPASS) {
+                    mainGENERIC_PRIORITY, &Ex2_handle) != pdPASS) {
 		goto err_ex2;
 	}
+
 	tumFUtilPrintTaskStateList();
 	
-	vTaskSuspend(BufferSwap);
+	vTaskSuspend(BufferSwap_handle);
 /*-----------------------------------------------------------------------------------------------*/	
 	/* start FreeRTOS Sceduler: Should never get passed this function */
 
-	vTaskStartScheduler(); 
-
 	tumFUtilPrintTaskStateList();
+
+	vTaskStartScheduler(); 
 	
 	atexit(aIODeinit);
 
@@ -124,7 +129,7 @@ int main(int argc, char *argv[])
 /*-----------------------------------------------------------------------------------------------*/	
 /* Error handling -> delete everything that has been initialized so far (Backwards the Init Order)*/
 err_ex2:
-	vTaskDelete(BufferSwap); // Delete TaskHandle
+	vTaskDelete(BufferSwap_handle); // Delete TaskHandle
 err_bufferswap:
 	vSemaphoreDelete(ScreenLock);
 err_screen_lock:
