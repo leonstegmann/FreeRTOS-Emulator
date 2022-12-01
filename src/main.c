@@ -1,4 +1,32 @@
-#include "main.h"
+/* Library includes */
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <inttypes.h>
+#include <SDL2/SDL_scancode.h> //for reading Keyboard Input
+#include "AsyncIO.h"
+
+/* FreeRTOS includes */
+#include "FreeRTOS.h"
+#include "queue.h"
+#include "semphr.h"
+#include "task.h"
+
+/* TUM_Library includes  */
+#include "TUM_Ball.h"
+#include "TUM_Print.h"
+#include "TUM_Draw.h"
+#include "TUM_Event.h"
+#include "TUM_Sound.h"
+#include "TUM_Utils.h"
+#include "TUM_Font.h"
+#include"TUM_FreeRTOS_Utils.h"
+
+/* Project includes  */
+#include"main.h"
+#include"buttons.h"
+#include "ex2.h"
 
 /**
  * @brief Task to swap the buffer of the screen to have a smooth user experience
@@ -23,8 +51,8 @@ void vSwapBuffers(void *pvParameters)
 }
 
 /* RTOS Taskhandles -> initializing*/
-TaskHandle_t BufferSwap = NULL;
-TaskHandle_t ex2_handle = NULL;
+TaskHandle_t BufferSwap_handle  = NULL;
+TaskHandle_t Ex2_handle  = NULL;
 TaskHandle_t ex3_draw_handle = NULL;
 TaskHandle_t ex3_t1_handle = NULL;
 
@@ -79,12 +107,12 @@ int main(int argc, char *argv[])
 	/* FreeRTOS Task creation*/
 	if (xTaskCreate(vSwapBuffers, "BufferSwapTask",
                     mainGENERIC_STACK_SIZE * 2, NULL, configMAX_PRIORITIES,
-                    &BufferSwap) != pdPASS) {
+                    &BufferSwap_handle) != pdPASS) {
         goto err_bufferswap;
 	}
 	
 	if (xTaskCreate(vExercise2, "Exercise_2", mainGENERIC_STACK_SIZE * 2, NULL,
-                    mainGENERIC_PRIORITY, &ex2_handle) != pdPASS) {
+                    mainGENERIC_PRIORITY, &Ex2_handle) != pdPASS) {
 		goto err_ex2;
 	}
 			
@@ -102,14 +130,14 @@ int main(int argc, char *argv[])
 
 	tumFUtilPrintTaskStateList();
 
-	vTaskSuspend(BufferSwap); // Task Suspended for Debug purposes
-	vTaskSuspend(ex2_handle);
+	vTaskSuspend(BufferSwap_handle);
+	vTaskSuspend(Ex2_handle);
 	vTaskSuspend(ex3_t1_handle);
 	
-	tumFUtilPrintTaskStateList();
-
 /*-----------------------------------------------------------------------------------------------*/	
 	/* start FreeRTOS Sceduler: Should never get passed this function */
+
+	tumFUtilPrintTaskStateList();
 
 	vTaskStartScheduler(); 
 	
@@ -122,9 +150,9 @@ int main(int argc, char *argv[])
 err_ex3_t1:
 	vTaskDelete(ex3_draw_handle);
 err_ex3_draw:
-	vTaskDelete(ex2_handle);
+	vTaskDelete(Ex2_handle);
 err_ex2:
-	vTaskDelete(BufferSwap); // Delete TaskHandle
+	vTaskDelete(BufferSwap_handle); // Delete TaskHandle
 err_bufferswap:
 	vSemaphoreDelete(ScreenLock);
 err_screen_lock:

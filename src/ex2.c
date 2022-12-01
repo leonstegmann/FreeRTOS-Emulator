@@ -1,3 +1,23 @@
+/* Library includes */
+#include <stdio.h>
+#include"math.h"
+
+/* FreeRTOS includes */
+#include "FreeRTOS.h"
+#include "queue.h"
+#include "semphr.h"
+#include "task.h"
+
+/* TUM_Library includes  */
+#include "TUM_Draw.h"
+#include "TUM_Ball.h"
+#include "TUM_Event.h"
+#include "TUM_Font.h"
+
+/* Project includes  */
+#include"main.h"
+#include"shapes.h"
+#include"buttons.h"
 #include"ex2.h"
 
 void vExercise2(void *pvParameters)
@@ -57,7 +77,6 @@ void vExercise2(void *pvParameters)
     while (1) {
         if(DrawSignal)
             /* so no other task can draw at the same time */
-            //xSemaphoreTake(ex2Mutex, portMAX_DELAY);
             if(xSemaphoreTake(DrawSignal, 10) == pdTRUE);
 
             tumEventFetchEvents(FETCH_EVENT_NONBLOCK); // Query events backend for new events, ie. button presses
@@ -142,8 +161,6 @@ void vExercise2(void *pvParameters)
 
             //Update last synch time
             vTaskDelayUntil(&xLastWakeTime, updatePeriod);
-            
-            //xSemaphoreGive(ex2Mutex);
-        
+                    
     }
 }
