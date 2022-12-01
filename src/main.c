@@ -27,6 +27,8 @@
 #include"main.h"
 #include"buttons.h"
 #include "ex2.h"
+#include "ex3.h"
+
 
 /**
  * @brief Task to swap the buffer of the screen to have a smooth user experience

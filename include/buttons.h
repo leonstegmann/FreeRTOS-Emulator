@@ -7,6 +7,12 @@
 #ifndef __BUTTONS_H__
 #define __BUTTONS_H__
 
+/* FreeRTOS includes  */
+#include <SDL2/SDL_scancode.h>
+
+/* TUM_Library includes  */
+#include"TUM_Draw.h"
+
  /* Defines variables  */
 #define KEYCODE(CHAR) SDL_SCANCODE_##CHAR
 #define  DEBOUNCEDELAY (TickType_t) 50      // the debounce time

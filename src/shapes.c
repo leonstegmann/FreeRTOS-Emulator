@@ -8,6 +8,7 @@
 
 /* Project includes  */
 #include"shapes.h"
+#include"defines.h"
 
 circle_t *createCircle(coord_t initial_location, unsigned short radius,
                    unsigned int colour)
