@@ -1,9 +1,6 @@
 #ifndef __SHAPES_H__  
 #define __SHAPES_H__
 
-#include"stdio.h"
-#include"TUM_Draw.h"
-
 /**
  * @brief Properties that every shape has -> inheritance
  * @param starting_position starting location

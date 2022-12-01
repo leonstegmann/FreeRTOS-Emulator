@@ -1,9 +1,12 @@
+/* Library includes */
 #include <stdio.h>
 #include"stdlib.h"
 #include"math.h"
 
+/* TUM_Library includes  */
 #include"TUM_Draw.h"
 
+/* Project includes  */
 #include"shapes.h"
 #include"ex2.h"
 

@@ -1,3 +1,15 @@
+/* FreeRTOS includes  */
+#include <SDL2/SDL_scancode.h>
+#include "FreeRTOS.h"
+#include "semphr.h"
+#include"task.h"
+
+/* TUM_Library includes  */
+#include"TUM_Draw.h"
+#include "TUM_Event.h"
+#include "TUM_Print.h"
+ 
+ /* Project includes  */
 #include "buttons.h"
 
 buttons_buffer_t buttons = { 0 };

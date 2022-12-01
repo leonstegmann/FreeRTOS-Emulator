@@ -1,4 +1,32 @@
+/* Library includes */
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <inttypes.h>
+#include <SDL2/SDL_scancode.h> //for reading Keyboard Input
+#include "AsyncIO.h"
+
+/* FreeRTOS includes */
+#include "FreeRTOS.h"
+#include "queue.h"
+#include "semphr.h"
+#include "task.h"
+
+/* TUM_Library includes  */
+#include "TUM_Ball.h"
+#include "TUM_Print.h"
+#include "TUM_Draw.h"
+#include "TUM_Event.h"
+#include "TUM_Sound.h"
+#include "TUM_Utils.h"
+#include "TUM_Font.h"
+#include"TUM_FreeRTOS_Utils.h"
+
+/* Project includes  */
 #include"main.h"
+#include"buttons.h"
+#include "ex2.h"
 
 /**
  * @brief Task to swap the buffer of the screen to have a smooth user experience
