@@ -25,7 +25,6 @@ void vSwapBuffers(void *pvParameters)
 /* RTOS Semaphorehandles -> Initiating  */
 SemaphoreHandle_t DrawSignal = NULL;
 SemaphoreHandle_t ScreenLock = NULL;
-SemaphoreHandle_t ex2Mutex = NULL;
 
 int main(int argc, char *argv[])
 {
@@ -66,31 +65,29 @@ int main(int argc, char *argv[])
         goto err_screen_lock;
     }
 
-	ex2Mutex = xSemaphoreCreateMutex();
-    if (!ex2Mutex) {
-        PRINT_ERROR("Failed to create exercise2 semaphore");
-        goto err_ex2mutex;
-    }
 	printf("\nInitialization SUCCESS!! \nMoving on to create tasks \n");    
 
 /*-----------------------------------------------------------------------------------------------*/	
 	/* FreeRTOS Task creation*/
-/*	if (xTaskCreate(vSwapBuffers, "BufferSwapTask",
+	if (xTaskCreate(vSwapBuffers, "BufferSwapTask",
                     mainGENERIC_STACK_SIZE * 2, NULL, configMAX_PRIORITIES,
                     &BufferSwap) != pdPASS) {
         goto err_bufferswap;
 	}
-*/
+
 	if (xTaskCreate(vExercise2, "Exercise_2", mainGENERIC_STACK_SIZE * 2, NULL,
                     mainGENERIC_PRIORITY, &ex2_handle) != pdPASS) {
 		goto err_ex2;
 	}
 	tumFUtilPrintTaskStateList();
 	
+	vTaskSuspend(BufferSwap);
 /*-----------------------------------------------------------------------------------------------*/	
 	/* start FreeRTOS Sceduler: Should never get passed this function */
 
 	vTaskStartScheduler(); 
+
+	tumFUtilPrintTaskStateList();
 	
 	atexit(aIODeinit);
 
@@ -101,8 +98,6 @@ int main(int argc, char *argv[])
 err_ex2:
 	vTaskDelete(BufferSwap); // Delete TaskHandle
 err_bufferswap:
-	vSemaphoreDelete(ex2_handle);
-err_ex2mutex:
 	vSemaphoreDelete(ScreenLock);
 err_screen_lock:
 	vSemaphoreDelete(DrawSignal);

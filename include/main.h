@@ -43,5 +43,5 @@ static TaskHandle_t BufferSwap = NULL; // FreeRTOS intern: Used to pass a handle
 /* RTOS Semaphorehandles -> Instantiating  */
 extern SemaphoreHandle_t DrawSignal;
 extern SemaphoreHandle_t ScreenLock;
-extern SemaphoreHandle_t ex2Mutex;
+
 #endif // _MAIN_
