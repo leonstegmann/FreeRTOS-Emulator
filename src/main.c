@@ -25,6 +25,7 @@ void vSwapBuffers(void *pvParameters)
 /* RTOS Taskhandles -> initializing*/
 TaskHandle_t BufferSwap = NULL;
 TaskHandle_t ex2_handle = NULL;
+TaskHandle_t ex3_draw_handle = NULL;
 TaskHandle_t ex3_t1_handle = NULL;
 
 /* RTOS Semaphorehandles -> initializing  */
@@ -66,13 +67,13 @@ int main(int argc, char *argv[])
         goto err_draw_signal;
     }
 
-    ScreenLock = xSemaphoreCreateMutex();
+    ScreenLock = xSemaphoreCreateMutex(); //Locks Screen 
     if (!ScreenLock) {
         PRINT_ERROR("Failed to create screen lock");
         goto err_screen_lock;
     }
 
-	printf("\nInitialization SUCCESS!! \nMoving on to create tasks \n");    
+	printf("\nInitialization SUCCESS!! \nMoving on to create tasks... \n");    
 
 /*-----------------------------------------------------------------------------------------------*/	
 	/* FreeRTOS Task creation*/
@@ -81,10 +82,15 @@ int main(int argc, char *argv[])
                     &BufferSwap) != pdPASS) {
         goto err_bufferswap;
 	}
-
+	
 	if (xTaskCreate(vExercise2, "Exercise_2", mainGENERIC_STACK_SIZE * 2, NULL,
                     mainGENERIC_PRIORITY, &ex2_handle) != pdPASS) {
 		goto err_ex2;
+	}
+			
+	if (xTaskCreate(vExercise3Draw, "Exercise_3_Draw", mainGENERIC_STACK_SIZE * 2, NULL,
+                    mainGENERIC_PRIORITY, &ex3_draw_handle) != pdPASS) {
+		goto err_ex3_draw;
 	}
 
 	if (xTaskCreate(vExercise3Task1, "Exercise_3_Task_1", mainGENERIC_STACK_SIZE * 2, NULL,
@@ -98,6 +104,7 @@ int main(int argc, char *argv[])
 
 	vTaskSuspend(BufferSwap); // Task Suspended for Debug purposes
 	vTaskSuspend(ex2_handle);
+	vTaskSuspend(ex3_t1_handle);
 	
 	tumFUtilPrintTaskStateList();
 
@@ -113,6 +120,8 @@ int main(int argc, char *argv[])
 /*-----------------------------------------------------------------------------------------------*/	
 /* Error handling -> delete everything that has been initialized so far (Backwards the Init Order)*/
 err_ex3_t1:
+	vTaskDelete(ex3_draw_handle);
+err_ex3_draw:
 	vTaskDelete(ex2_handle);
 err_ex2:
 	vTaskDelete(BufferSwap); // Delete TaskHandle

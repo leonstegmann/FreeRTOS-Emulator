@@ -26,6 +26,7 @@
  * @brief Exercise 3: 
  * @param pvParameters A value that is passed as the paramater to the created task in FreeRTOS 
  */
+void vExercise3Draw(void *pvParameters);
 void vExercise3Task1(void *pvParameters);
 void vExercise3Task2(void *pvParameters);
 
