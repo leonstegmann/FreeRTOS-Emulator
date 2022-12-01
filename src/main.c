@@ -25,6 +25,9 @@
 #define mainGENERIC_STACK_SIZE ((unsigned short)2560)
 
 static TaskHandle_t DemoTask = NULL;
+static TaskHandle_t printTask = NULL;
+
+QueueHandle_t QueueHandle = NULL;
 
 typedef struct buttons_buffer {
 	unsigned char buttons[SDL_NUM_SCANCODES];
@@ -42,6 +45,16 @@ void xGetButtonInput(void)
 }
 
 #define KEYCODE(CHAR) SDL_SCANCODE_##CHAR
+
+void vPrint(void *pvParameters){
+	long int rx_int;
+	while(1){
+		if(xQueueReceive(QueueHandle,&rx_int,portMAX_DELAY))
+			printf("%ld",rx_int);
+		else
+			printf("Queue receive Failed");
+	}
+}
 
 void vDemoTask(void *pvParameters)
 {
@@ -95,6 +108,9 @@ void vDemoTask(void *pvParameters)
 
 		tumDrawUpdateScreen(); // Refresh the screen to draw string
 
+		printf("Updated!!\n");
+
+		xQueueSend(QueueHandle, &the_time.tv_sec, portMAX_DELAY);
 		// Basic sleep of 1000 milliseconds
 		vTaskDelay((TickType_t)1000);
 	}
@@ -126,16 +142,25 @@ int main(int argc, char *argv[])
 		PRINT_ERROR("Failed to create buttons lock");
 		goto err_buttons_lock;
 	}
+	
+	QueueHandle = xQueueCreate(10,sizeof(int));
 
 	if (xTaskCreate(vDemoTask, "DemoTask", mainGENERIC_STACK_SIZE * 2, NULL,
 			mainGENERIC_PRIORITY, &DemoTask) != pdPASS) {
 		goto err_demotask;
 	}
 
+	if (xTaskCreate(vPrint, "PrintTask", mainGENERIC_STACK_SIZE * 2, NULL,
+			mainGENERIC_PRIORITY, &printTask) != pdPASS) {
+		goto err_printtask;
+	}
+
 	vTaskStartScheduler();
 
 	return EXIT_SUCCESS;
 
+err_printtask:
+	vTaskDelete(DemoTask);
 err_demotask:
 	vSemaphoreDelete(buttons.lock);
 err_buttons_lock:
