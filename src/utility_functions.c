@@ -1,4 +1,28 @@
+/* TUM_Library includes  */
+#include "TUM_Print.h"
+#include "TUM_Draw.h"
+#include "TUM_Event.h"
+#include "TUM_Utils.h"
+#include "TUM_FreeRTOS_Utils.h"
+
+/* FreeRTOS includes */
+#include "FreeRTOS.h"
+#include "queue.h"
+#include "semphr.h"
+#include "task.h"
+
+/* TUM_Library includes  */
+#include "TUM_Print.h"
+#include "TUM_Draw.h"
+#include "TUM_Event.h"
+#include "TUM_Utils.h"
+#include "TUM_Font.h"
+#include"TUM_FreeRTOS_Utils.h"
+
+/* Project includes  */
 #include"utility_functions.h"
+#include "defines.h"
+#include"main.h"
 
 void vDrawFPS(void)
 {
@@ -52,4 +76,21 @@ void vDrawFPS(void)
 
     tumFontSelectFontFromHandle(cur_font);
     tumFontPutFontHandle(cur_font);
+}
+
+void vSwapBuffers(void *pvParameters)
+{
+    TickType_t xLastWakeTime;
+    xLastWakeTime = xTaskGetTickCount();
+    const TickType_t frameratePeriod = 1000 / FRAMERATE;
+
+	printf("\nDebugPrint: bufferswap "); //DEBUG PRINT
+
+    while (1) {
+        tumDrawUpdateScreen();
+        tumEventFetchEvents(FETCH_EVENT_BLOCK);
+        xSemaphoreGive(DrawSignal);
+        vTaskDelayUntil(&xLastWakeTime,
+                        pdMS_TO_TICKS(frameratePeriod));
+    }
 }

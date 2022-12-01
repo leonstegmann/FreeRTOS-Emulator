@@ -26,6 +26,7 @@
 /* Project includes  */
 #include"main.h"
 #include"buttons.h"
+#include"utility_functions.h"
 #include "ex2.h"
 #include "ex3.h"
 
@@ -33,24 +34,6 @@
 /**
  * @brief Task to swap the buffer of the screen to have a smooth user experience
 */
-void vSwapBuffers(void *pvParameters)
-{
-    TickType_t xLastWakeTime;
-    xLastWakeTime = xTaskGetTickCount();
-    const TickType_t frameratePeriod = 1000 / FRAMERATE;
-
-    //tumDrawBindThread(); // Setup Rendering handle with correct GL context
-
-	printf("\nDebugPrint: bufferswap "); //DEBUG PRINT
-
-    while (1) {
-        tumDrawUpdateScreen();
-        tumEventFetchEvents(FETCH_EVENT_BLOCK);
-        xSemaphoreGive(DrawSignal);
-        vTaskDelayUntil(&xLastWakeTime,
-                        pdMS_TO_TICKS(frameratePeriod));
-    }
-}
 
 /* RTOS Taskhandles -> initializing*/
 TaskHandle_t BufferSwap_handle  = NULL;

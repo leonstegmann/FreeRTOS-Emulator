@@ -1,11 +1,29 @@
-#include"ex3.h"
+/* FreeRTOS includes */
+#include "FreeRTOS.h"
+#include "queue.h"
+#include "semphr.h"
+#include "task.h"
 
-extern SemaphoreHandle_t DrawSignal;
+/* TUM_Library includes  */
+#include "TUM_Draw.h"
+#include "TUM_Ball.h"
+#include "TUM_Event.h"
+#include "TUM_Font.h"
+
+/* Project includes  */
+#include"ex3.h"
+#include"main.h"
+#include"shapes.h"
+#include"buttons.h"
+#include"utility_functions.h"
+
+
 
 void vExercise3Draw(void *pvParameters){
 
     /* Create Left Blinkng Circle*/
     circle_t *left_circle = createCircle((coord_t) {SCREEN_WIDTH / 4, SCREEN_HEIGHT / 2 }, (unsigned short) 30, Red);
+    
     tumDrawBindThread();
     
     while(1){
@@ -17,13 +35,10 @@ void vExercise3Draw(void *pvParameters){
         
         tumDrawClear(White);
 
+        vDrawFPS();
+
         drawCircle(left_circle);
         tumDrawUpdateScreen();
-        vTaskDelay((TickType_t) 500);
-
-        tumDrawClear(White);
-        tumDrawUpdateScreen();
-        vTaskDelay((TickType_t) 500);
 
     }
 }

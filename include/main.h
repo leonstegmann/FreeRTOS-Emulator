@@ -15,7 +15,6 @@
 * FreeRTOS intern: Used to pass a handle to the created task out of the xTaskCreate() function.
 */
 extern TaskHandle_t Ex2_handle;
-extern TaskHandle_t BufferSwap_handle; 
 
 /* RTOS Semaphorehandles -> Instantiating  */
 extern SemaphoreHandle_t DrawSignal;
