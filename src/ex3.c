@@ -20,6 +20,11 @@
 
 QueueHandle_t Queue_ex3_Handle = NULL;
 
+TaskHandle_t Ex3_draw_handle = NULL;
+TaskHandle_t Ex3_t1_handle = NULL;
+TaskHandle_t ex3_t2_handle = NULL;
+
+
 
 void vExercise3Draw(void *pvParameters){
 
@@ -91,3 +96,37 @@ void vExercise3Task2(void *pvParameters){
 
     }
 }
+
+int createExercise3Tasks(void){
+
+    if (xTaskCreate(vExercise3Draw, "Exercise_3_Draw", mainGENERIC_STACK_SIZE * 2, NULL,
+                    mainGENERIC_PRIORITY, &Ex3_draw_handle) != pdPASS) {
+		goto err_ex3_draw;
+	}
+
+	if (xTaskCreate(vExercise3Task1, "Exercise_3_Task_1", mainGENERIC_STACK_SIZE * 2, NULL,
+                    mainGENERIC_PRIORITY+1, &Ex3_t1_handle) != pdPASS) {
+		goto err_ex3_t1;
+	}
+
+	if (xTaskCreate(vExercise3Task2, "Exercise_3_Task_2", mainGENERIC_STACK_SIZE * 2, NULL,
+                    mainGENERIC_PRIORITY, &ex3_t2_handle) != pdPASS) {
+		goto err_ex3_t2;
+	}
+
+    //vTaskSuspend(Ex3_draw_handle);
+	//vTaskSuspend(Ex3_t1_handle);
+	//vTaskSuspend(ex3_t2_handle);
+
+    return 0;
+
+err_ex3_t2:
+	vTaskDelete(Ex3_t1_handle);
+err_ex3_t1:
+	vTaskDelete(Ex3_draw_handle);
+err_ex3_draw:
+
+    return -1;
+
+}
+    
