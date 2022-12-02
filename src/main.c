@@ -38,8 +38,10 @@
 /* RTOS Taskhandles -> initializing*/
 TaskHandle_t BufferSwap_handle  = NULL;
 TaskHandle_t Ex2_handle  = NULL;
-TaskHandle_t ex3_draw_handle = NULL;
-TaskHandle_t ex3_t1_handle = NULL;
+TaskHandle_t Ex3_draw_handle = NULL;
+TaskHandle_t Ex3_t1_handle = NULL;
+TaskHandle_t ex3_t2_handle = NULL;
+
 
 /* RTOS Semaphorehandles -> initializing  */
 SemaphoreHandle_t DrawSignal = NULL;
@@ -102,22 +104,27 @@ int main(int argc, char *argv[])
 	}
 			
 	if (xTaskCreate(vExercise3Draw, "Exercise_3_Draw", mainGENERIC_STACK_SIZE * 2, NULL,
-                    mainGENERIC_PRIORITY, &ex3_draw_handle) != pdPASS) {
+                    mainGENERIC_PRIORITY, &Ex3_draw_handle) != pdPASS) {
 		goto err_ex3_draw;
 	}
 
 	if (xTaskCreate(vExercise3Task1, "Exercise_3_Task_1", mainGENERIC_STACK_SIZE * 2, NULL,
-                    mainGENERIC_PRIORITY, &ex3_t1_handle) != pdPASS) {
+                    mainGENERIC_PRIORITY, &Ex3_t1_handle) != pdPASS) {
 		goto err_ex3_t1;
 	}
 
-
+	if (xTaskCreate(vExercise3Task2, "Exercise_3_Task_2", mainGENERIC_STACK_SIZE * 2, NULL,
+                    mainGENERIC_PRIORITY, &ex3_t2_handle) != pdPASS) {
+		goto err_ex3_t2;
+	}
 
 	tumFUtilPrintTaskStateList();
 
 	vTaskSuspend(BufferSwap_handle);
 	vTaskSuspend(Ex2_handle);
-	vTaskSuspend(ex3_t1_handle);
+	vTaskSuspend(Ex3_draw_handle);
+	//vTaskSuspend(Ex3_t1_handle);
+	//vTaskSuspend(ex3_t2_handle);
 	
 /*-----------------------------------------------------------------------------------------------*/	
 	/* start FreeRTOS Sceduler: Should never get passed this function */
@@ -132,8 +139,10 @@ int main(int argc, char *argv[])
 
 /*-----------------------------------------------------------------------------------------------*/	
 /* Error handling -> delete everything that has been initialized so far (Backwards the Init Order)*/
+err_ex3_t2:
+	vTaskDelete(Ex3_t1_handle);
 err_ex3_t1:
-	vTaskDelete(ex3_draw_handle);
+	vTaskDelete(Ex3_draw_handle);
 err_ex3_draw:
 	vTaskDelete(Ex2_handle);
 err_ex2:
