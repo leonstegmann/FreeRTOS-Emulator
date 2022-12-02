@@ -88,6 +88,12 @@ int main(int argc, char *argv[])
         goto err_screen_lock;
     }
 
+	Queue_ex3_Handle = xQueueCreate(10,sizeof(int));
+	if (!Queue_ex3_Handle) {
+        PRINT_ERROR("Failed to create queue");
+        goto err_queue_ex3_handle;
+	}
+	
 	printf("\nInitialization SUCCESS!! \nMoving on to create tasks... \n");    
 
 /*-----------------------------------------------------------------------------------------------*/	
@@ -109,7 +115,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (xTaskCreate(vExercise3Task1, "Exercise_3_Task_1", mainGENERIC_STACK_SIZE * 2, NULL,
-                    mainGENERIC_PRIORITY, &Ex3_t1_handle) != pdPASS) {
+                    mainGENERIC_PRIORITY+1, &Ex3_t1_handle) != pdPASS) {
 		goto err_ex3_t1;
 	}
 
@@ -122,7 +128,7 @@ int main(int argc, char *argv[])
 
 	vTaskSuspend(BufferSwap_handle);
 	vTaskSuspend(Ex2_handle);
-	vTaskSuspend(Ex3_draw_handle);
+	//vTaskSuspend(Ex3_draw_handle);
 	//vTaskSuspend(Ex3_t1_handle);
 	//vTaskSuspend(ex3_t2_handle);
 	
@@ -148,6 +154,8 @@ err_ex3_draw:
 err_ex2:
 	vTaskDelete(BufferSwap_handle); // Delete TaskHandle
 err_bufferswap:
+	vQueueDelete(Queue_ex3_Handle);
+err_queue_ex3_handle:
 	vSemaphoreDelete(ScreenLock);
 err_screen_lock:
 	vSemaphoreDelete(DrawSignal);
