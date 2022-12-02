@@ -27,6 +27,7 @@
 #include"main.h"
 #include"buttons.h"
 #include"utility_functions.h"
+#include"state_machine.h"
 #include "ex2.h"
 #include "ex3.h"
 
@@ -100,7 +101,14 @@ int main(int argc, char *argv[])
                     &BufferSwap_handle) != pdPASS) {
         goto err_bufferswap;
 	}
-	
+
+	if (xTaskCreate(vStateMaschine, "StateMachine",
+                    mainGENERIC_STACK_SIZE * 2, NULL,
+                    configMAX_PRIORITIES - 1, &StateMachine_handle) != pdPASS) {
+        PRINT_TASK_ERROR("StateMachine");
+        goto err_statemachine;
+    }
+
 	if (xTaskCreate(vExercise2, "Exercise_2", mainGENERIC_STACK_SIZE * 2, NULL,
                     mainGENERIC_PRIORITY, &Ex2_handle) != pdPASS) {
 		goto err_ex2;
@@ -127,9 +135,12 @@ int main(int argc, char *argv[])
 
 /*-----------------------------------------------------------------------------------------------*/	
 /* Error handling -> delete everything that has been initialized so far (Backwards the Init Order)*/
+	deleteExercise3Tasks();
 err_Exercise3:
 	vTaskDelete(Ex2_handle);
 err_ex2:
+	vTaskDelete(StateMachine_handle);
+err_statemachine:
 	vTaskDelete(BufferSwap_handle); // Delete TaskHandle
 err_bufferswap:
 	vQueueDelete(Queue_ex3_Handle);

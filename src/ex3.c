@@ -130,3 +130,15 @@ err_ex3_draw:
 
 }
     
+void deleteExercise3Tasks(void)
+{
+    if (Ex3_draw_handle) {
+        vTaskDelete(Ex3_draw_handle);
+    }
+    if (Ex3_t1_handle) {
+        vTaskDelete(Ex3_t1_handle);
+    }
+    if (ex3_t2_handle) {
+        vTaskDelete(ex3_t2_handle);
+    }
+}

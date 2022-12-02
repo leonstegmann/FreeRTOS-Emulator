@@ -13,6 +13,7 @@ void vExercise3Task1(void *pvParameters);
 void vExercise3Task2(void *pvParameters);
 
 int createExercise3Tasks(void);
+void deleteExercise3Tasks(void);
 
 extern QueueHandle_t Queue_ex3_Handle;
 
