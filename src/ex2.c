@@ -164,3 +164,16 @@ void vExercise2(void *pvParameters)
                     
     }
 }
+
+void Exercise2EnterFunction(void){
+    printf("Resume Tasks 2");
+    vTaskResume(Ex2_handle);
+	
+}
+
+void Exercise2ExitFunction(void){
+    printf("Exiting Tasks 2");
+    vTaskSuspend(Ex2_handle);
+
+}
+

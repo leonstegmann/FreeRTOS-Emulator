@@ -2,7 +2,7 @@
 #define __MAIN__
 /*Libraries*/
 #include "task.h"
-#include"semaphore.h"
+#include"semphr.h"
 
 /* Defines variables  */
 #define mainGENERIC_PRIORITY    (tskIDLE_PRIORITY)
@@ -15,6 +15,7 @@
 * FreeRTOS intern: Used to pass a handle to the created task out of the xTaskCreate() function.
 */
 extern TaskHandle_t Ex2_handle;
+
 
 /* RTOS Semaphorehandles -> Instantiating  */
 extern SemaphoreHandle_t DrawSignal;

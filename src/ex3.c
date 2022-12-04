@@ -114,9 +114,9 @@ int createExercise3Tasks(void){
 		goto err_ex3_t2;
 	}
 
-    //vTaskSuspend(Ex3_draw_handle);
-	//vTaskSuspend(Ex3_t1_handle);
-	//vTaskSuspend(ex3_t2_handle);
+    vTaskSuspend(Ex3_draw_handle);
+	vTaskSuspend(Ex3_t1_handle);
+	vTaskSuspend(ex3_t2_handle);
 
     return 0;
 
@@ -142,3 +142,21 @@ void deleteExercise3Tasks(void)
         vTaskDelete(ex3_t2_handle);
     }
 }
+
+void Exercise3ExitFunction(void){
+    printf("Exiting Tasks 3");
+    vTaskSuspend(Ex3_draw_handle);
+	vTaskSuspend(Ex3_t1_handle);
+	vTaskSuspend(ex3_t2_handle);
+
+}
+
+void Exercise3EnterFunction(void){
+    printf("Resume Tasks 3");
+    vTaskResume(Ex3_draw_handle);
+	vTaskResume(Ex3_t1_handle);
+	vTaskResume(ex3_t2_handle);
+
+}
+
+

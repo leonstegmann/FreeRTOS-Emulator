@@ -39,7 +39,7 @@
 /* RTOS Taskhandles -> initializing*/
 TaskHandle_t BufferSwap_handle  = NULL;
 TaskHandle_t Ex2_handle  = NULL;
-
+TaskHandle_t StatesHandler = NULL;
 
 /* RTOS Semaphorehandles -> initializing  */
 SemaphoreHandle_t DrawSignal = NULL;
@@ -92,6 +92,12 @@ int main(int argc, char *argv[])
         goto err_queue_ex3_handle;
 	}
 	
+	/* State Maschine confiuration*/
+	states_add(NULL,Exercise2EnterFunction,NULL,Exercise2ExitFunction,1,"ex2");
+	states_add(NULL,Exercise3EnterFunction,NULL,Exercise3ExitFunction,2,"ex3");
+	states_init();
+	states_set_state(1);
+
 	printf("\nInitialization SUCCESS!! \nMoving on to create tasks... \n");    
 
 /*-----------------------------------------------------------------------------------------------*/	
@@ -102,13 +108,12 @@ int main(int argc, char *argv[])
         goto err_bufferswap;
 	}
 
-	if (xTaskCreate(vStateMaschine, "StateMachine",
-                    mainGENERIC_STACK_SIZE * 2, NULL,
-                    configMAX_PRIORITIES - 1, &StateMachine_handle) != pdPASS) {
-        PRINT_TASK_ERROR("StateMachine");
-        goto err_statemachine;
+	 if (xTaskCreate(vStatesHandler, "StatesHandler", 
+                    mainGENERIC_STACK_SIZE * 2, NULL, configMAX_PRIORITIES-2,
+                    &StatesHandler) != pdPASS) {
+        goto err_statesHandler;
     }
-
+	
 	if (xTaskCreate(vExercise2, "Exercise_2", mainGENERIC_STACK_SIZE * 2, NULL,
                     mainGENERIC_PRIORITY, &Ex2_handle) != pdPASS) {
 		goto err_ex2;
@@ -139,8 +144,8 @@ int main(int argc, char *argv[])
 err_Exercise3:
 	vTaskDelete(Ex2_handle);
 err_ex2:
-	vTaskDelete(StateMachine_handle);
-err_statemachine:
+	vTaskDelete(StatesHandler);
+err_statesHandler:
 	vTaskDelete(BufferSwap_handle); // Delete TaskHandle
 err_bufferswap:
 	vQueueDelete(Queue_ex3_Handle);

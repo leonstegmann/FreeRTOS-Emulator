@@ -10,4 +10,8 @@
  */
 void vExercise2(void *pvParameters);
 
+void Exercise2EnterFunction(void);
+void Exercise2ExitFunction(void);
+
+
 #endif //__EX_2__

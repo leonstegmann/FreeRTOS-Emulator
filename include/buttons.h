@@ -9,6 +9,7 @@
 
 /* FreeRTOS includes  */
 #include <SDL2/SDL_scancode.h>
+#include"semphr.h"
 
 /* TUM_Library includes  */
 #include"TUM_Draw.h"
