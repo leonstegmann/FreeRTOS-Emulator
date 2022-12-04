@@ -93,10 +93,9 @@ int main(int argc, char *argv[])
 	}
 	
 	/* State Maschine confiuration*/
-	states_add(NULL,Exercise2EnterFunction,NULL,Exercise2ExitFunction,1,"ex2");
 	states_add(NULL,Exercise3EnterFunction,NULL,Exercise3ExitFunction,2,"ex3");
+	states_add(NULL,Exercise2EnterFunction,NULL,Exercise2ExitFunction,1,"ex2");
 	states_init();
-	states_set_state(1);
 
 	printf("\nInitialization SUCCESS!! \nMoving on to create tasks... \n");    
 
