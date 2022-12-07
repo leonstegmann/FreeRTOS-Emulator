@@ -77,7 +77,7 @@ void vExercise2(void *pvParameters)
     while (1) {
         if(DrawSignal)
             /* so no other task can draw at the same time */
-            if(xSemaphoreTake(DrawSignal, 10) == pdTRUE);
+            if(xSemaphoreTake(DrawSignal, 10) == pdTRUE){
 
             tumEventFetchEvents(FETCH_EVENT_NONBLOCK); // Query events backend for new events, ie. button presses
 
@@ -161,7 +161,7 @@ void vExercise2(void *pvParameters)
 
             //Update last synch time
             vTaskDelayUntil(&xLastWakeTime, updatePeriod);
-                    
+        }
     }
 }
 
