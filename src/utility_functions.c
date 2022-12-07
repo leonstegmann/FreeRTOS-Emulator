@@ -84,8 +84,6 @@ void vSwapBuffers(void *pvParameters)
     xLastWakeTime = xTaskGetTickCount();
     const TickType_t frameratePeriod = 1000 / FRAMERATE;
 
-	printf("\nDebugPrint: bufferswap "); //DEBUG PRINT
-
     while (1) {
         tumDrawUpdateScreen();
         tumEventFetchEvents(FETCH_EVENT_BLOCK);
