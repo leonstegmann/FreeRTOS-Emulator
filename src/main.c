@@ -28,6 +28,7 @@
 #include"buttons.h"
 #include"utility_functions.h"
 #include"state_machine.h"
+#include"states.h"
 #include "ex2.h"
 #include "ex3.h"
 
@@ -44,6 +45,7 @@ TaskHandle_t StatesHandler = NULL;
 /* RTOS Semaphorehandles -> initializing  */
 SemaphoreHandle_t DrawSignal = NULL;
 SemaphoreHandle_t ScreenLock = NULL;
+
 
 int main(int argc, char *argv[])
 {
@@ -92,10 +94,6 @@ int main(int argc, char *argv[])
         goto err_queue_ex3_handle;
 	}
 	
-	/* State Maschine confiuration*/
-	states_add(NULL,Exercise3EnterFunction,NULL,Exercise3ExitFunction,2,"ex3");
-	states_add(NULL,Exercise2EnterFunction,NULL,Exercise2ExitFunction,1,"ex2");
-	states_init();
 
 	printf("\nInitialization SUCCESS!! \nMoving on to create tasks... \n");    
 
@@ -107,23 +105,20 @@ int main(int argc, char *argv[])
         goto err_bufferswap;
 	}
 
-	 if (xTaskCreate(vStatesHandler, "StatesHandler", 
+	 if (xTaskCreate(vStatesMachineTask, "StatesHandler", 
                     mainGENERIC_STACK_SIZE * 2, NULL, configMAX_PRIORITIES-2,
                     &StatesHandler) != pdPASS) {
         goto err_statesHandler;
     }
 	
 	if (xTaskCreate(vExercise2, "Exercise_2", mainGENERIC_STACK_SIZE * 2, NULL,
-                    mainGENERIC_PRIORITY, &Ex2_handle) != pdPASS) {
+                    mainGENERIC_PRIORITY+1, &Ex2_handle) != pdPASS) {
 		goto err_ex2;
 	}
 			
 	if (createExercise3Tasks())
 		goto err_Exercise3;
 
-	tumFUtilPrintTaskStateList();
-
-	vTaskSuspend(BufferSwap_handle);
 	vTaskSuspend(Ex2_handle);
 	
 /*-----------------------------------------------------------------------------------------------*/	
