@@ -23,7 +23,6 @@
  * @copyright GNU GPL v3
  * */
 #include <errno.h>
-#include "error.h"
 #include "states.h"
 
 #include <stdlib.h>
@@ -130,7 +129,6 @@ unsigned char states_run(void) {
 unsigned char states_add(void (*probe)(void), void (*enter)(void),
                          void (*run)(void), void (*exit)(void), int ID,
                          char *name) {
-  unsigned char error = 0;
   state_t *ret = calloc(1, sizeof(state_t));
   if (!ret)
     return -ENOMEM;
