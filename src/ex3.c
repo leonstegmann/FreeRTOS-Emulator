@@ -193,7 +193,7 @@ void deleteExercise3Tasks(void)
 }
 
 void Exercise3ExitFunction(void){
-    printf("\nExiting Tasks 3\n");
+    printf("Exiting Tasks 3\n");
     vTaskSuspend(Ex3_draw_handle);
 	vTaskSuspend(Ex3_t1_handle);
 	vTaskSuspend(ex3_t2_handle);
@@ -202,10 +202,10 @@ void Exercise3ExitFunction(void){
 }
 
 void Exercise3EnterFunction(void){
-    printf("\nResume Tasks 3\n");
+    printf("Resume Tasks 3\n");
     vTaskResume(Ex3_draw_handle);
-//	vTaskResume(Ex3_t1_handle);
-//	vTaskResume(ex3_t2_handle);
+	vTaskResume(Ex3_t1_handle);
+	vTaskResume(ex3_t2_handle);
     vTaskResume(buttonTrigger_handle);
     vTaskResume(buttonOne_handle);
 
