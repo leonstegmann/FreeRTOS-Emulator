@@ -21,6 +21,7 @@ void vStatesMachineTask(void *pvParameters)
 	states_add(NULL,Exercise2EnterFunction,NULL,Exercise2ExitFunction,1,"ex2");
 	states_init();
 	states_set_state(0);
+	tumFUtilPrintTaskStateList();
 
 	int total_stages = states_get_state_count();
 	
@@ -39,12 +40,11 @@ void vStatesMachineTask(void *pvParameters)
 						printf("\nButton E pressed ---------------------------------------------------\\n");
 						int current_state = states_get_state_id();
 						states_set_state((current_state+1) % total_stages);
+						tumFUtilPrintTaskStateList();
 					}
 			xSemaphoreGive(buttons.lock);
 		}
 		//Delay as specified in STATE_MACHINE_INTERVAL
-		printf("DebugPrint in StatesMachine\n");
-		tumFUtilPrintTaskStateList();
 
 		vTaskDelay((TickType_t) 500);
 	}
