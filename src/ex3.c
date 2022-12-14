@@ -28,9 +28,11 @@ TaskHandle_t Ex3_t1_handle = NULL;
 TaskHandle_t ex3_t2_handle = NULL;
 
 QueueHandle_t Queue_ButtonOne = NULL;
-SemaphoreHandle_t handleButtonOne = NULL;
+QueueHandle_t Queue_ButtonTwo = NULL;
+SemaphoreHandle_t ButtonOneSemaphore = NULL;
 TaskHandle_t buttonTrigger_handle = NULL;
 TaskHandle_t buttonOne_handle = NULL;
+TaskHandle_t buttonTwo_handle = NULL;
 
 void vExercise3Draw(void *pvParameters){
 
@@ -44,6 +46,7 @@ void vExercise3Draw(void *pvParameters){
     char strButton[30];
     int strButtonWidth;
     int rxButton1;
+    int rxButton2;
 
     while(1){
         if (DrawSignal)
@@ -55,9 +58,9 @@ void vExercise3Draw(void *pvParameters){
             tumDrawClear(White);
 
             vDrawFPS();
-            
-            if(xQueuePeek(Queue_ButtonOne, &rxButton1, 0)){ // is always True as there is always ine element in the queue                
-                sprintf(strButton,"pressed Button [N]: %d Button [M] ",rxButton1);
+            /*Check for new counter Button One*/
+            if(xQueuePeek(Queue_ButtonOne, &rxButton1, 0) && xQueuePeek(Queue_ButtonTwo, &rxButton2, 0)){ // is always True as there is always ine element in the queue                
+                sprintf(strButton,"pressed Button [N]: %d Button [M]: %d ",rxButton1 ,rxButton2);
                 if (!tumGetTextSize((char *)strButton, &strButtonWidth, NULL))
                     tumDrawText(strButton, SCREEN_CENTER.x -
                                 strButtonWidth / 2, 3*SCREEN_HEIGHT/4 - DEFAULT_FONT_SIZE / 2,
@@ -126,9 +129,9 @@ int createExercise3Tasks(void){
                     mainGENERIC_PRIORITY+1, &ex3_t2_handle) != pdPASS) {
 		goto err_ex3_t2;
 	}
-     handleButtonOne = xSemaphoreCreateBinary();
-    if (!handleButtonOne) {
-        PRINT_ERROR("Failed to create handleButtonOne semaphore");
+     ButtonOneSemaphore = xSemaphoreCreateBinary();
+    if (!ButtonOneSemaphore) {
+        PRINT_ERROR("Failed to create ButtonOneSemaphore semaphore");
         goto err_handleButtonOne;
     }
     Queue_ButtonOne = xQueueCreate(1, sizeof(unsigned int));
@@ -148,20 +151,38 @@ int createExercise3Tasks(void){
                     mainGENERIC_PRIORITY+1, &buttonOne_handle) != pdPASS) {
 		goto err_buttonOne;
 	}
+    Queue_ButtonTwo = xQueueCreate(1, sizeof(unsigned int));
+    if (!Queue_ButtonTwo) {
+        PRINT_ERROR("Failed to create Queue_ButtonTwo queue");
+        goto err_Queue_ButtonTwo;
+    }
+    /* to set the counter (Queue Element) to Zero */
+    xQueueSend(Queue_ButtonTwo, &zero ,0);
+
+    if (xTaskCreate(vButtonTwo, "Buuton Two", mainGENERIC_STACK_SIZE , NULL,
+                    mainGENERIC_PRIORITY+1, &buttonTwo_handle) != pdPASS) {
+		goto err_buttonTwo;
+	}
+
     vTaskSuspend(Ex3_draw_handle);
 	vTaskSuspend(Ex3_t1_handle);
 	vTaskSuspend(ex3_t2_handle);
     vTaskSuspend(buttonTrigger_handle);
     vTaskSuspend(buttonOne_handle);
+    vTaskSuspend(buttonTwo_handle);
 
     return 0;
-    
+
+err_buttonTwo:
+    vQueueDelete(Queue_ButtonTwo);
+err_Queue_ButtonTwo:
+    vTaskDelete(buttonOne_handle);
 err_buttonOne:
     vTaskDelete(buttonTrigger_handle);
 err_buttonTrigger:
     vQueueDelete(Queue_ButtonOne);
 err_Queue_ButtonOne:
-    vSemaphoreDelete(handleButtonOne);
+    vSemaphoreDelete(ButtonOneSemaphore);
 err_handleButtonOne:
     vTaskDelete(ex3_t2_handle);
 err_ex3_t2:
@@ -187,8 +208,12 @@ void deleteExercise3Tasks(void)
     }
     if (buttonTrigger_handle) {
         vTaskDelete(buttonTrigger_handle);
-    }if (buttonOne_handle) {
+    }
+    if (buttonOne_handle) {
         vTaskDelete(buttonOne_handle);
+    }
+    if (buttonTwo_handle) {
+        vTaskDelete(buttonTwo_handle);
     }
 }
 
@@ -199,6 +224,7 @@ void Exercise3ExitFunction(void){
 	vTaskSuspend(ex3_t2_handle);
     vTaskSuspend(buttonTrigger_handle);
     vTaskSuspend(buttonOne_handle);
+    vTaskSuspend(buttonTwo_handle);
 }
 
 void Exercise3EnterFunction(void){
@@ -208,7 +234,7 @@ void Exercise3EnterFunction(void){
 	vTaskResume(ex3_t2_handle);
     vTaskResume(buttonTrigger_handle);
     vTaskResume(buttonOne_handle);
-
+    vTaskResume(buttonTwo_handle);
 }
 
 void vButtonTrigger(void* pvparameters){
@@ -219,12 +245,13 @@ void vButtonTrigger(void* pvparameters){
 
         if (checkButton(KEYCODE(N))) {
             printf("Button One pressed\n");
-            xSemaphoreGive(handleButtonOne);
+            xSemaphoreGive(ButtonOneSemaphore);
         }
-    /*    if (checkButton(KEYCODE(M))) {
-            xTaskNotify(Exercise3button2, BIT_BUTTON2, eSetBits);
+        if (checkButton(KEYCODE(M))) {
+            printf("Button Two pressed\n");
+            xTaskNotifyGive( buttonTwo_handle );
         }
-    */
+    
         vTaskDelay(10);    
     }
 
@@ -235,7 +262,7 @@ void vButtonOne(void * pvparameters){
     unsigned int counter = 0;
 
     while(1) {
-        if(xSemaphoreTake(handleButtonOne, 0) == pdTRUE) {
+        if(xSemaphoreTake(ButtonOneSemaphore, 0) == pdTRUE) {
             counter++;
             //xQueueOverwrite is used, because the queue should be full at all times
             printf("Counter of Button One incremented\n");
@@ -243,6 +270,20 @@ void vButtonOne(void * pvparameters){
         }
         vTaskDelay(10);
     }
+}
 
 
+void vButtonTwo(void * pvparameters){
+
+    unsigned int counter = 0;
+ 
+    while(1)
+    {
+        if(ulTaskNotifyTake(pdTRUE, portMAX_DELAY) != 0){
+            counter++;
+            printf("Counter of Button Two incremented\n");
+            xQueueOverwrite(Queue_ButtonTwo, &counter);
+        }
+        vTaskDelay(10);
+    }
 }

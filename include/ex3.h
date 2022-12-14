@@ -14,6 +14,8 @@ void vExercise3Task2(void *pvParameters);
 
 void vButtonTrigger(void* pvparameters);
 void vButtonOne(void * pvparameters);
+/* Triggers Button by TaskNotification*/
+void vButtonTwo(void * pvparameters);
 
 
 int createExercise3Tasks(void);
