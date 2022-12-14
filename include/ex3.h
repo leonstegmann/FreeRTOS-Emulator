@@ -12,11 +12,16 @@ void vExercise3Draw(void *pvParameters);
 void vExercise3Task1(void *pvParameters);
 void vExercise3Task2(void *pvParameters);
 
+void vButtonTrigger(void* pvparameters);
+void vButtonOne(void * pvparameters);
+
+
 int createExercise3Tasks(void);
 void deleteExercise3Tasks(void);
 
 void Exercise3EnterFunction(void);
 void Exercise3ExitFunction(void);
+
 
 extern QueueHandle_t Queue_ex3_Handle;
 
