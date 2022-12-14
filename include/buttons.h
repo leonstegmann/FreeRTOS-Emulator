@@ -55,7 +55,7 @@ void buttonsExit(void);
  * @brief ensures the debounce of the buttons 
  * @param keyvalue intakes the "#define KEYCODE(CHAR)" from the "SDL_SCANCODE_##CHAR" as "int"
  */
-void checkButton(int );
+int checkButton(int );
 
 /**
  * @brief draws the button with the corresponding keyvalue 

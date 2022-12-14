@@ -61,15 +61,18 @@ void resetCounter(int keyvalue){
     buttons.counter[keyvalue] = 0;
 }
 
-void checkButton(int keyvalue){
+int checkButton(int keyvalue){
+    int ret = 0;
     if (buttons.currentState[keyvalue]) { // Equiv to SDL_SCANCODE_Q
         TickType_t now = xTaskGetTickCount();
         if ( buttons.currentState[keyvalue] > 0 && buttons.prevState[keyvalue] == 0){
             if ((now - buttons.lastTimePressed[keyvalue]) > DEBOUNCEDELAY ){
                 buttons.counter[keyvalue]++;
                 buttons.lastTimePressed[keyvalue] = now;
+                ret = 1;
             }
         }
     }
     buttons.prevState[keyvalue] = buttons.currentState[keyvalue];
+    return ret;
 }

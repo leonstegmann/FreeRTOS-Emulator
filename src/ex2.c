@@ -88,7 +88,7 @@ void vExercise2(void *pvParameters)
                     exit(EXIT_SUCCESS);
                 }
                 for (int i=0; i < 4 ; i++){
-                    checkButton(button_keycodes[i]);
+                    if(checkButton(button_keycodes[i]));
                 }
                 xSemaphoreGive(buttons.lock);
             }
